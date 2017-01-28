@@ -1,0 +1,52 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:textColor="@android:color/white"
+    tools:context="com.campos.david.appointments.Login">
+    <ImageView
+        android:gravity="center"
+        android:layout_width="285dp"
+        android:layout_height="222dp"
+        android:src="@drawable/logo"
+        android:id="@+id/ivLogo"
+        android:contentDescription="@string/logo"
+        android:layout_gravity="center_horizontal|top"
+        android:layout_above="@+id/tvTextPhoneNumber"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/phone_number"
+        android:id="@+id/tvTextPhoneNumber"
+        android:layout_gravity="center_horizontal"
+        android:layout_centerVertical="true"
+        android:labelFor="@+id/etPhoneNumberInput"
+        android:layout_centerHorizontal="true" />
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="phone"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/etPhoneNumberInput"
+        android:layout_gravity="center_horizontal"
+        android:layout_below="@+id/tvTextPhoneNumber"
+        android:layout_alignRight="@+id/ivLogo"
+        android:layout_alignEnd="@+id/ivLogo"
+        android:layout_alignLeft="@+id/ivLogo"
+        android:layout_alignStart="@+id/ivLogo"
+        android:digits="+0123456789"
+        />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/log_in_register"
+        android:id="@+id/btnLogin"
+        android:layout_below="@+id/etPhoneNumberInput"
+        android:layout_alignLeft="@+id/etPhoneNumberInput"
+        android:layout_alignStart="@+id/etPhoneNumberInput"
+        android:layout_alignRight="@+id/etPhoneNumberInput"
+        android:layout_alignEnd="@+id/etPhoneNumberInput" />
+</RelativeLayout>

@@ -7,4 +7,8 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_bd_dummy_data"
+        android:title="Generate dummy data"
+        app:showAsAction="never"/>
 </menu>

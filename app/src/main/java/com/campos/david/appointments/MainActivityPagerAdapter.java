@@ -11,7 +11,10 @@ import android.support.v4.app.FragmentPagerAdapter;
 public class MainActivityPagerAdapter extends FragmentPagerAdapter{
     final int PAGE_COUNT = 3;
     private String tabTitles[] = new String[] { "Refused", "Accepted", "Pending" };
-    private String tabAppointmentStates[] = new String[] {"refused", "accepted", "pending"};
+    private String tabAppointmentStates[] = new String[] {
+            AppointmentListFragment.APPOINTMENTS_STATE_REFUSED,
+            AppointmentListFragment.APPOINTMENTS_STATE_ACCEPTED,
+            AppointmentListFragment.APPOINTMENTS_STATE_PENDING};
     private Context context;
 
     public MainActivityPagerAdapter(FragmentManager fm, Context context) {

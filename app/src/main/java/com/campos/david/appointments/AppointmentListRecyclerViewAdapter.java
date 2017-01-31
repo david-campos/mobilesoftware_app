@@ -1,29 +1,32 @@
 package com.campos.david.appointments;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
 import android.support.v7.widget.RecyclerView;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.campos.david.appointments.AppointmentListFragment.OnListFragmentInteractionListener;
-import com.campos.david.appointments.dummy.DummyContent.DummyItem;
-
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
+ * {@link RecyclerView.Adapter} supplied by a Cursor
  */
-public class AppointmentListRecyclerViewAdapter extends RecyclerView.Adapter<AppointmentListRecyclerViewAdapter.ViewHolder> {
+public class AppointmentListRecyclerViewAdapter extends CursorRecyclerViewAdapter<AppointmentListRecyclerViewAdapter.ViewHolder> {
 
-    private final List<DummyItem> mValues;
-    private final OnListFragmentInteractionListener mListener;
+    private AppointmentListFragment.OnListFragmentInteractionListener mListener;
+    Context mContext;
 
-    public AppointmentListRecyclerViewAdapter(List<DummyItem> items, OnListFragmentInteractionListener listener) {
-        mValues = items;
-        mListener = listener;
+    public AppointmentListRecyclerViewAdapter(Context context) {
+        super(context, null);
+        mContext = context;
     }
 
     @Override
@@ -34,10 +37,15 @@ public class AppointmentListRecyclerViewAdapter extends RecyclerView.Adapter<App
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+    public void onBindViewHolder(final ViewHolder holder, Cursor cursor) {
+        holder.mTitleView.setText(cursor.getString(AppointmentListFragment.CURSOR_NAME_COL));
+        String place = cursor.getString(AppointmentListFragment.CURSOR_PLACE_COL);
+        String data = new SimpleDateFormat("dd/MM/yyyy, HH:mm", Locale.US).format(
+                new Date(cursor.getLong(AppointmentListFragment.CURSOR_TIMESTAMP_COL)));
+        holder.mProposalInfoView.setText(place + ", " + data);
+        holder.mWithInfoView.setText("With: Josh, Wietske,...");
+        holder.mImageView.setImageResource(R.drawable.ic_info_black_24dp);
+        holder.mImageView.setColorFilter(mContext.getResources().getColor(R.color.colorPrimary));
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,33 +53,32 @@ public class AppointmentListRecyclerViewAdapter extends RecyclerView.Adapter<App
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
+                    mListener.onListFragmentInteraction(holder.getAdapterPosition());
                 }
             }
         });
     }
 
-    @Override
-    public int getItemCount() {
-        return mValues.size();
-    }
-
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
-        public DummyItem mItem;
+        public final ImageView mImageView;
+        public final TextView mTitleView;
+        public final TextView mProposalInfoView;
+        public final TextView mWithInfoView;
+        public int mPosition = -1;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.id);
-            mContentView = (TextView) view.findViewById(R.id.content);
+            mImageView = (ImageView) view.findViewById(R.id.iv_imageView);
+            mTitleView = (TextView) view.findViewById(R.id.tv_title);
+            mProposalInfoView = (TextView) view.findViewById(R.id.tv_proposalInfo);
+            mWithInfoView = (TextView) view.findViewById(R.id.tv_withInfo);
         }
 
         @Override
         public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
+            return super.toString() + " '" + mTitleView.getText() + "'";
         }
     }
 }

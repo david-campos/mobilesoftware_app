@@ -1,0 +1,21 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:icon="@drawable/ic_notifications_black_24dp"
+        android:title="@string/pref_header_notifications">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/key_notify_appointments"
+            android:summary="@string/summary_notify_appointments"
+            android:title="@string/title_notify_appointments" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:icon="@drawable/ic_info_black_24dp"
+        android:title="@string/pref_header_users">
+
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:icon="@drawable/ic_sync_black_24dp"
+        android:title="@string/pref_header_profile">
+
+    </PreferenceCategory>
+</PreferenceScreen>

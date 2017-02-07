@@ -20,4 +20,39 @@
 
     <string name="appointment_type_icon">Appointment type icon</string>
 
+    <string name="text_loading">Loading…</string>
+    <string name="text_alone">Alone</string>
+    <string name="format_place_and_data">%1$s, %2$s</string>
+    <string name="cant_open_appointment">Sorry, we can\'t open this appoint now</string>
+    <string name="something_wrong">Something has gone wrong.</string>
+    <string name="this_indicates_the_appointment_is_yours">This indicates the appointment is yours</string>
+    <string name="date_and_time_of_the_appointment">Date and time of the appointment</string>
+    <string name="text_accept_invitation">I\'ll be there!</string>
+    <string name="suggest_change">Suggest a change</string>
+    <string name="refuse">Refuse</string>
+    <string name="cancel_refuse">Wait… maybe I\'ll go</string>
+    <string name="text_cancel_accepted_invitation">I thought it better…</string>
+    <string name="text_you">You</string>
+    <string name="text_accept">Accept</string>
+    <string name="google_play_missing">Google Play services is not installed on the phone.</string>
+    <string name="google_play_disabled">Google Play services is disabled on the device. Please, enable Google Play services.</string>
+    <string name="google_play_out_of_date">The current version of Google Play services is out of date. Please, update Google Play Services.</string>
+    <string name="google_play_updating">Google Play service is updating.</string>
+    <string name="google_play_invalid">Google Play version installed on the phone is not valid.</string>
+    <string name="map_impossible_to_display">"It isn't possible to display the map. "</string>
+    <string name="text_creator">creator</string>
+    <string name="text_pending">pending</string>
+    <string name="text_refused">refused</string>
+    <string name="text_accepted">accepted</string>
+    <string name="text_x_is_blocked">" is blocked"</string>
+    <string name="text_unblock">Unblock</string>
+    <string name="text_block">Block</string>
+    <string name="close_discussion">Close discussion</string>
+    <string name="open_discussion">Open discussion</string>
+    <string name="text_user_profile_picture">User\'s profile picture</string>
+
+    <plurals name="withs_and_x_more">
+        <item quantity="one">" and %d more"</item>
+        <item quantity="other">" and %d more"</item>
+    </plurals>
 </resources>

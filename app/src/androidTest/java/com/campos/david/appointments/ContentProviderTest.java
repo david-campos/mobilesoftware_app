@@ -524,7 +524,7 @@ public class ContentProviderTest extends ProviderTestCase2<ContentProvider> {
         String type = getMockContentResolver().getType(DBContract.AppointmentsEntry.CONTENT_URI);
         String itemType = getMockContentResolver().getType(uri);
 
-        assertEquals(type, DBContract.AppointmentsEntry.CONTENT_TYPE);
+        assertEquals(type, DBContract.AppointmentsEntry.CONTENT_BASIC_TYPE);
         // Not equals to other content type
         assertNotSame(type, DBContract.UsersEntry.CONTENT_TYPE);
         assertNotSame(type, DBContract.PropositionsEntry.CONTENT_TYPE);
@@ -818,6 +818,9 @@ public class ContentProviderTest extends ProviderTestCase2<ContentProvider> {
         // Preparing stuff
         String[] usersProjection = {
                 DBContract.UsersEntry.TABLE_NAME + "." + DBContract.UsersEntry._ID};
+        String[] usersWithProjection = {
+                DBContract.InvitationsEntry.TABLE_NAME + "." + DBContract.InvitationsEntry.COLUMN_APPOINTMENT,
+                DBContract.UsersEntry.TABLE_NAME + "." + DBContract.UsersEntry._ID};
         String[] appointmentsProjection = {
                 DBContract.AppointmentsEntry.TABLE_NAME + "." + DBContract.AppointmentsEntry._ID};
         String[] invitationsProjection = {
@@ -835,6 +838,7 @@ public class ContentProviderTest extends ProviderTestCase2<ContentProvider> {
         values0.put(DBContract.InvitationsEntry.COLUMN_STATE, "pending");
         Uri uri0 = getMockContentResolver().insert(DBContract.InvitationsEntry.CONTENT_URI, values0);
         assertNotNull(uri0);
+
         ContentValues values1 = new ContentValues();
         values1.put(DBContract.InvitationsEntry.COLUMN_USER, uriUser2.getLastPathSegment());
         values1.put(DBContract.InvitationsEntry.COLUMN_APPOINTMENT, uriAppointment0.getLastPathSegment());
@@ -842,6 +846,7 @@ public class ContentProviderTest extends ProviderTestCase2<ContentProvider> {
         values1.put(DBContract.InvitationsEntry.COLUMN_STATE, "pending");
         Uri uri1 = getMockContentResolver().insert(DBContract.InvitationsEntry.CONTENT_URI, values1);
         assertNotNull(uri1);
+
         ContentValues values2 = new ContentValues();
         // No user (owner of the session)
         values2.put(DBContract.InvitationsEntry.COLUMN_APPOINTMENT, uriAppointment0.getLastPathSegment());
@@ -849,6 +854,7 @@ public class ContentProviderTest extends ProviderTestCase2<ContentProvider> {
         values2.put(DBContract.InvitationsEntry.COLUMN_STATE, "pending");
         Uri uri2 = getMockContentResolver().insert(DBContract.InvitationsEntry.CONTENT_URI, values2);
         assertNotNull(uri2);
+
         ContentValues values3 = new ContentValues();
         // No user (owner of the session)
         values3.put(DBContract.InvitationsEntry.COLUMN_APPOINTMENT, uriAppointment1.getLastPathSegment());
@@ -856,6 +862,7 @@ public class ContentProviderTest extends ProviderTestCase2<ContentProvider> {
         values3.put(DBContract.InvitationsEntry.COLUMN_STATE, "accepted");
         Uri uri3 = getMockContentResolver().insert(DBContract.InvitationsEntry.CONTENT_URI, values3);
         assertNotNull(uri3);
+
         ContentValues values4 = new ContentValues();
         // No user (owner of the session)
         values4.put(DBContract.InvitationsEntry.COLUMN_APPOINTMENT, uriAppointment2.getLastPathSegment());
@@ -887,7 +894,6 @@ public class ContentProviderTest extends ProviderTestCase2<ContentProvider> {
                 Assert.fail("Unknown id '" + c.getString(0) + "'");
                 return;
             }
-
             assertEquals(c.getString(1), ptr.getAsString(DBContract.InvitationsEntry.COLUMN_USER));
             assertEquals(c.getString(2), ptr.getAsString(DBContract.InvitationsEntry.COLUMN_APPOINTMENT));
             assertEquals(c.getString(3), ptr.getAsString(DBContract.InvitationsEntry.COLUMN_REASON));
@@ -930,6 +936,19 @@ public class ContentProviderTest extends ProviderTestCase2<ContentProvider> {
             assertTrue(c.getString(0).equals(uriUser0.getLastPathSegment()) ||
                     c.getString(0).equals(uriUser1.getLastPathSegment()) ||
                     c.getString(0).equals(uriUser2.getLastPathSegment()));
+        } while (c.moveToNext());
+        c.close();
+        // Check /users/with/ (we should receive one appointment with two users invited)
+        c = getMockContentResolver().query(
+                Uri.withAppendedPath(DBContract.UsersEntry.CONTENT_URI, "with"),
+                usersWithProjection, null, null, null);
+        assertNotNull(c);
+        assertEquals(2, c.getCount());
+        assertTrue(c.moveToFirst());
+        do {
+            assertEquals(uriAppointment0.getLastPathSegment(), c.getString(0));
+            assertTrue(c.getString(1).equals(uriUser1.getLastPathSegment()) ||
+                    c.getString(1).equals(uriUser2.getLastPathSegment()));
         } while(c.moveToNext());
         c.close();
 

@@ -4,12 +4,12 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.campos.david.appointments.model.DBContract.InvitationsEntry;
-import com.campos.david.appointments.model.DBContract.AppointmentsEntry;
-import com.campos.david.appointments.model.DBContract.PropositionsEntry;
-import com.campos.david.appointments.model.DBContract.UsersEntry;
-import com.campos.david.appointments.model.DBContract.ReasonsEntry;
 import com.campos.david.appointments.model.DBContract.AppointmentTypesEntry;
+import com.campos.david.appointments.model.DBContract.AppointmentsEntry;
+import com.campos.david.appointments.model.DBContract.InvitationsEntry;
+import com.campos.david.appointments.model.DBContract.PropositionsEntry;
+import com.campos.david.appointments.model.DBContract.ReasonsEntry;
+import com.campos.david.appointments.model.DBContract.UsersEntry;
 
 
 /**
@@ -17,7 +17,7 @@ import com.campos.david.appointments.model.DBContract.AppointmentTypesEntry;
  */
 public class DBHelper extends SQLiteOpenHelper{
     // On scheme update, increment the version
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "appoint.db";
 
     public DBHelper(Context context) {

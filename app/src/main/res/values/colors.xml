@@ -9,5 +9,9 @@
     <color name="colorAccent">#64DD17</color>
     <color name="rippleLight">#ffffffff</color>
 
+    <color name="btnRefused">#C2383B</color>
+    <color name="btnClosed">#64DD17</color>
+    <color name="colorTime">#4c4c4c</color>
     <color name="black_overlay">#66000000</color>
+    <color name="colorBlock">#b71c1c</color>
 </resources>

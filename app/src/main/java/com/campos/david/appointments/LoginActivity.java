@@ -7,10 +7,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.campos.david.appointments.activityMain.MainActivity;
+
 /**
- * Login activity of the app
+ * LoginActivity activity of the app
  */
-public class Login extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
     EditText mEditText;
     Button btnLogin;
 

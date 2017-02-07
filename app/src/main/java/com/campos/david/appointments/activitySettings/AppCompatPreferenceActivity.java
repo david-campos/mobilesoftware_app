@@ -1,4 +1,4 @@
-package com.campos.david.appointments;
+package com.campos.david.appointments.activitySettings;
 
 import android.content.res.Configuration;
 import android.os.Bundle;

@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:textColor="@android:color/white"
-    tools:context="com.campos.david.appointments.Login">
+    tools:context=".LoginActivity">
     <ImageView
         android:gravity="center"
         android:layout_width="285dp"

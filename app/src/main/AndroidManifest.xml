@@ -25,11 +25,13 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
         <provider
             android:name=".model.ContentProvider"
             android:authorities="com.campos.david.appointments.provider"
             android:enabled="true"
             android:exported="false" />
+
         <activity
             android:name=".LoginActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -38,6 +40,7 @@
             android:theme="@style/LoginScreenTheme">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
+
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
@@ -45,8 +48,8 @@
         <activity
             android:name=".activityAppointment.AppointmentActivity"
             android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".activityMain.MainActivity">
+            android:parentActivityName=".activityMain.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activityMain.MainActivity" />
@@ -59,6 +62,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activityMain.MainActivity" />
         </activity>
+        <activity android:name=".AboutActivity"></activity>
     </application>
 
 </manifest>

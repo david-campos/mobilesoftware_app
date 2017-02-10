@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">AppOint</string>
+    <string name="author">David Campos Rodríguez</string>
+    <string name="text_author">Author: %1$s</string>
 
     <string name="logo">Logo</string>
     <string name="phone_number">Phone number:</string>
@@ -50,6 +52,8 @@
     <string name="close_discussion">Close discussion</string>
     <string name="open_discussion">Open discussion</string>
     <string name="text_user_profile_picture">User\'s profile picture</string>
+    <string name="text_about">About</string>
+    <string name="author_mail"><![CDATA[<david.campos@rai.usc.es>]]></string>
 
     <plurals name="withs_and_x_more">
         <item quantity="one">" and %d more"</item>

@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.campos.david.appointments.AboutActivity;
 import com.campos.david.appointments.R;
 import com.campos.david.appointments.activitySettings.SettingsActivity;
 import com.campos.david.appointments.model.DBContract;
@@ -70,6 +71,10 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_settings:
                 Intent throwSettingsIntent = new Intent(getApplicationContext(), SettingsActivity.class);
                 startActivity(throwSettingsIntent);
+                return true;
+            case R.id.action_about:
+                Intent throwAboutIntent = new Intent(getApplicationContext(), AboutActivity.class);
+                startActivity(throwAboutIntent);
                 return true;
             case R.id.action_bd_dummy_data: {
                 Log.d(TAG, "Generating dummy data");

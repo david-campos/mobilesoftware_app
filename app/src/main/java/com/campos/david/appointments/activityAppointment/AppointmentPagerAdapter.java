@@ -9,7 +9,7 @@ import android.support.v4.app.FragmentPagerAdapter;
  * AppointmentPagerAdapter
  */
 public class AppointmentPagerAdapter extends FragmentPagerAdapter {
-    public static final String[] PAGE_NAMES = {"Suggestions", "Main", "Invited"};
+    public static final String[] PAGE_NAMES = {"Invited", "Main", "Suggestions"};
 
     private int mAppointmentId;
     private boolean mAppointmentClosed;
@@ -27,13 +27,15 @@ public class AppointmentPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        if (position == 0) {
-            return InvitedListFragment.newInstance(mAppointmentId);
-        } else if (position == 1) {
-            return MainFragment.newInstance(mAppointmentId, mAppointmentClosed, mUserIsCreator);
-        } else {
-            return PlaceholderFragment.newInstance(position);
+        switch (position) {
+            case 0:
+                return InvitedListFragment.newInstance(mAppointmentId);
+            case 1:
+                return MainFragment.newInstance(mAppointmentId, mAppointmentClosed, mUserIsCreator);
+            case 2:
+                return PlaceholderFragment.newInstance(position);
         }
+        throw new IndexOutOfBoundsException("Position " + position + " isn't accepted for this pager.");
     }
 
     @Override
@@ -48,11 +50,7 @@ public class AppointmentPagerAdapter extends FragmentPagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         if (position < getCount()) {
-            if (mUserIsCreator) {
-                return PAGE_NAMES[position];
-            } else {
-                return PAGE_NAMES[position + 1];
-            }
+            return PAGE_NAMES[position];
         }
         return null;
     }

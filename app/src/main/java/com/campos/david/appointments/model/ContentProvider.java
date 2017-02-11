@@ -233,7 +233,6 @@ public class ContentProvider extends android.content.ContentProvider {
                 break;
             case USERS_WITH:
                 SQLiteDatabase db = mOpenHelper.getReadableDatabase();
-                Context ctx = getContext();
                 Cursor[] cursors = new Cursor[2];
 
                 tableName = String.format(
@@ -260,16 +259,24 @@ public class ContentProvider extends android.content.ContentProvider {
                         null, null, sortOrder);
 
                 MergeCursor cursor = new MergeCursor(cursors);
-                if (ctx != null)
+                Context ctx = getContext();
+                if (ctx != null) {
                     cursor.setNotificationUri(ctx.getContentResolver(), uri);
+                }
                 return cursor; // Doesn't get to the end!
             case PROPOSITIONS:
-                tableName = PropositionsEntry.TABLE_NAME;
+                tableName = "(" + PropositionsEntry.TABLE_NAME + " JOIN " + UsersEntry.TABLE_NAME +
+                        " ON (" +
+                        PropositionsEntry.TABLE_NAME + "." + PropositionsEntry.COLUMN_CREATOR +
+                        " = " + UsersEntry.TABLE_NAME + "." + UsersEntry._ID + ")" +
+                        ") JOIN " + ReasonsEntry.TABLE_NAME + " ON (" +
+                        ReasonsEntry.TABLE_NAME + "." + ReasonsEntry._ID + "=" +
+                        PropositionsEntry.TABLE_NAME + "." + PropositionsEntry.COLUMN_REASON + ")";
                 selection = selection!=null?
                         String.format("( %s ) AND %s",
                                 selection,
-                                PropositionsEntry.COLUMN_APPOINTMENT + " = ?"):
-                        PropositionsEntry.COLUMN_APPOINTMENT + " = ?";
+                                PropositionsEntry.TABLE_NAME + "." + PropositionsEntry.COLUMN_APPOINTMENT + " = ?") :
+                        PropositionsEntry.TABLE_NAME + "." + PropositionsEntry.COLUMN_APPOINTMENT + " = ?";
                 // We add the id to the selection args
                 if(selectionArgs != null) {
                     String[] newSelectionArgs = new String[selectionArgs.length + 1];
@@ -402,6 +409,7 @@ public class ContentProvider extends android.content.ContentProvider {
                 list.add(AppointmentsEntry.CONTENT_REFUSED_URI);
                 list.add(AppointmentsEntry.CONTENT_PENDING_URI);
                 list.add(UsersEntry.CONTENT_URI.buildUpon().appendPath("invited_to").build());
+                list.add(Uri.withAppendedPath(DBContract.UsersEntry.CONTENT_URI, "with"));
                 break;
         }
         return list;

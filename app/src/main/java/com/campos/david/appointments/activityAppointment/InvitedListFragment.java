@@ -35,7 +35,7 @@ public class InvitedListFragment extends Fragment implements LoaderManager.Loade
     private Snackbar snackbar = null;
 
     /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
+     * Mandatory empty constructor for the fragment manager to newInstance the
      * fragment (e.g. upon screen orientation changes).
      */
     public InvitedListFragment() {

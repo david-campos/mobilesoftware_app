@@ -54,6 +54,12 @@
     <string name="text_user_profile_picture">User\'s profile picture</string>
     <string name="text_about">About</string>
     <string name="author_mail"><![CDATA[<david.campos@rai.usc.es>]]></string>
+    <string name="text_suggestion">%1$s suggested %2$s.</string>
+    <string name="text_reason">Reason: %1$s\n%2$s</string>
+    <string name="description_leaves_background">Leaves in the background</string>
+    <string name="text_nothing_to_show_yet">No %1$s to show yet</string>
+    <string name="text_appointments">appointments</string>
+    <string name="text_suggestions">suggestions</string>
 
     <plurals name="withs_and_x_more">
         <item quantity="one">" and %d more"</item>

@@ -12,11 +12,12 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.campos.david.appointments.PersonalizedRecyclerView;
 import com.campos.david.appointments.R;
 import com.campos.david.appointments.activityAppointment.AppointmentActivity;
 import com.campos.david.appointments.model.DBContract;
@@ -26,6 +27,8 @@ import com.campos.david.appointments.model.DBContract;
  */
 public class AppointmentListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
         AppointmentListRecyclerViewAdapter.OnListFragmentInteractionListener {
+    private static final String TAG = AppointmentListFragment.class.getSimpleName();
+
     private static final String ARG_APPOINTMENTS_STATE = "appointments-state";
 
     public static final String APPOINTMENTS_STATE_REFUSED = "refused";
@@ -56,7 +59,7 @@ public class AppointmentListFragment extends Fragment implements LoaderManager.L
     private View mView = null;
 
     /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
+     * Mandatory empty constructor for the fragment manager to newInstance the
      * fragment (e.g. upon screen orientation changes).
      */
     public AppointmentListFragment() {
@@ -87,12 +90,15 @@ public class AppointmentListFragment extends Fragment implements LoaderManager.L
         mView = inflater.inflate(R.layout.fragment_appointment_list, container, false);
 
         // Set the adapter
-        if (mView instanceof RecyclerView) {
-            Context context = mView.getContext();
-            RecyclerView recyclerView = (RecyclerView) mView;
-            recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            recyclerView.setAdapter(mAdapter);
-        }
+        Context context = mView.getContext();
+        PersonalizedRecyclerView recyclerView = (PersonalizedRecyclerView) mView.findViewById(R.id.appointment_list);
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        View emptyView = mView.findViewById(R.id.on_list_empty);
+        ((TextView) emptyView.findViewById(R.id.tv_noElements)).setText(
+                getContext().getString(R.string.text_nothing_to_show_yet,
+                        getContext().getString(R.string.text_appointments)));
+        recyclerView.setEmptyView(emptyView);
+        recyclerView.setAdapter(mAdapter);
         return mView;
     }
 
@@ -139,6 +145,9 @@ public class AppointmentListFragment extends Fragment implements LoaderManager.L
                 mAdapter.swapWithsCursor(data);
                 break;
             case LOADER_APPOINTMENTS:
+                // I couldn't find why the loader_withs was not being notified on changes but this
+                // solves the problem anyway.
+                getLoaderManager().restartLoader(LOADER_WITHS, null, this);
                 mAdapter.swapCursor(data);
                 break;
         }

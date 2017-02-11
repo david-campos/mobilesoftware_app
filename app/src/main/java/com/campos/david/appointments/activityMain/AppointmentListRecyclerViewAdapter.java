@@ -2,8 +2,8 @@ package com.campos.david.appointments.activityMain;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DataSetObserver;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +34,6 @@ public class AppointmentListRecyclerViewAdapter extends CursorRecyclerViewAdapte
     private Context mContext;
     private Map<Integer, List<String>> mAppointmentWiths = new HashMap<>();
     private Cursor mWithsCursor;
-    private DataSetObserver mWithsObserver;
     private boolean mWithsValid;
 
     public AppointmentListRecyclerViewAdapter(Context context,
@@ -43,7 +42,6 @@ public class AppointmentListRecyclerViewAdapter extends CursorRecyclerViewAdapte
         mContext = context;
         mWithsCursor = null;
         mWithsValid = false;
-        mWithsObserver = new NotifyingDataSetObserver();
         mListener = listener;
     }
 
@@ -52,17 +50,12 @@ public class AppointmentListRecyclerViewAdapter extends CursorRecyclerViewAdapte
             return null;
         }
         Cursor oldCursor = mWithsCursor;
-        if (oldCursor != null && mWithsObserver != null) {
-            oldCursor.unregisterDataSetObserver(mWithsObserver);
-        }
         mWithsCursor = c;
         if (mWithsCursor != null) {
-            if (mWithsObserver != null) {
-                mWithsCursor.registerDataSetObserver(mWithsObserver);
-            }
             loadAppointmentWiths();
             mWithsValid = true;
             notifyDataSetChanged();
+            Log.d(TAG, "DataSetChanged notified");
         } else {
             mWithsValid = false;
             notifyDataSetChanged();
@@ -105,11 +98,11 @@ public class AppointmentListRecyclerViewAdapter extends CursorRecyclerViewAdapte
         holder.mTitleView.setText(cursor.getString(AppointmentListFragment.CURSOR_NAME_COL));
 
         String place = cursor.getString(AppointmentListFragment.CURSOR_PLACE_COL);
-        String data = SimpleDateFormat.getDateTimeInstance(
+        String date = SimpleDateFormat.getDateTimeInstance(
                 SimpleDateFormat.LONG, SimpleDateFormat.SHORT).format(
                 new Date(cursor.getLong(AppointmentListFragment.CURSOR_TIMESTAMP_COL)));
         holder.mProposalInfoView.setText(
-                mContext.getResources().getString(R.string.format_place_and_data, place, data));
+                mContext.getResources().getString(R.string.format_place_and_data, place, date));
 
         if (mWithsValid) {
             List<String> users = mAppointmentWiths.get(cursor.getInt(AppointmentListFragment.CURSOR_ID_COL));
@@ -177,19 +170,5 @@ public class AppointmentListRecyclerViewAdapter extends CursorRecyclerViewAdapte
      */
     public interface OnListFragmentInteractionListener {
         void onListFragmentInteraction(int position);
-    }
-
-    private class NotifyingDataSetObserver extends DataSetObserver {
-        @Override
-        public void onChanged() {
-            mWithsValid = true;
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public void onInvalidated() {
-            mWithsValid = false;
-            notifyDataSetChanged();
-        }
     }
 }

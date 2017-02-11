@@ -33,7 +33,7 @@ public class AppointmentPagerAdapter extends FragmentPagerAdapter {
             case 1:
                 return MainFragment.newInstance(mAppointmentId, mAppointmentClosed, mUserIsCreator);
             case 2:
-                return PlaceholderFragment.newInstance(position);
+                return SuggestionsFragment.newInstance(mAppointmentId);
         }
         throw new IndexOutOfBoundsException("Position " + position + " isn't accepted for this pager.");
     }

@@ -3,6 +3,11 @@
     <string name="author">David Campos Rodríguez</string>
     <string name="text_author">Author: %1$s</string>
 
+    <string name="session_file_key" translatable="false">session_file</string>
+    <string name="session_phone_key" translatable="false">session_phone</string>
+    <string name="session_key_key" translatable="false">session_key</string>
+    <string name="preferences_file_key" translatable="false">preferences_file</string>
+
     <string name="logo">Logo</string>
     <string name="phone_number">Phone number:</string>
     <string name="log_in_register">Log in / Register</string>
@@ -60,6 +65,12 @@
     <string name="text_nothing_to_show_yet">No %1$s to show yet</string>
     <string name="text_appointments">appointments</string>
     <string name="text_suggestions">suggestions</string>
+    <string name="api_uri_key">api_uri_key</string>
+    <string name="api_uri_default">127.0.0.1</string>
+    <string name="session_id_key">session_id</string>
+    <string name="login_failed_text">Some problem during login.</string>
+    <string name="api_url">Api url…</string>
+    <string name="changing_api_url">Changing API url…</string>
 
     <plurals name="withs_and_x_more">
         <item quantity="one">" and %d more"</item>

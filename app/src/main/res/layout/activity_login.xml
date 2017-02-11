@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:textColor="@android:color/white"
+    android:id="@+id/login_layout"
     tools:context=".LoginActivity">
     <ImageView
         android:gravity="center"
@@ -25,6 +26,16 @@
         android:layout_centerVertical="true"
         android:labelFor="@+id/etPhoneNumberInput"
         android:layout_centerHorizontal="true" />
+
+    <ProgressBar
+        android:id="@+id/pb_doing_login_bar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone" />
+
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

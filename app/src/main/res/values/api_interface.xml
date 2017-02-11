@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?><!-- Interface with the API. NOTHING TO TRANSLATE HERE!! -->
+<resources>
+    <string name="query_session_phone_key">phn</string>
+    <string name="query_session_key_key">key</string>
+    <string name="query_request_key">req</string>
+    <string name="query_session_id_key">ses</string>
+    <string name="query_appointment_id_key">aid</string>
+
+
+    <string name="req_init_session">ses</string>
+    <string name="response_session_key_key">key</string>
+    <string name="response_session_id_key">sessionId</string>
+
+    <integer name="response_error_code">500</integer>
+
+    <string name="response_result_key">result</string>
+    <string name="response_error_key">error</string>
+    <string name="response_error_code_key">code</string>
+</resources>

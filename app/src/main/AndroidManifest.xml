@@ -8,6 +8,7 @@
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="22" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <uses-feature
         android:glEsVersion="0x00020000"
@@ -54,15 +55,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activityMain.MainActivity" />
         </activity>
-        <activity
-            android:name=".activitySettings.SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:parentActivityName=".activityMain.MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activityMain.MainActivity" />
-        </activity>
         <activity android:name=".AboutActivity" />
+
+        <service
+            android:name=".services.UpdateUsersService"
+            android:enabled="true"
+            android:exported="false" />
     </application>
 
 </manifest>

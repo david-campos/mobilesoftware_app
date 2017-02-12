@@ -41,13 +41,15 @@ import java.util.List;
  * - /reasons/ Accesses all the reasons
  * - /appointment_types/ Accesses all the appointment types
  * - /invitations/ Accesses all the invitations
- * Possible Uri's for insert/update are:
+ * Possible Uri's for insert/update/delete are:
  * - /appointments/ Inserts appointments
  * - /users/ Inserts users
  * - /propositions/ Inserts propositions
  * - /reasons/ Inserts reasons
  * - /appointment_types/ Inserts appointment types
  * - /invitations/ Inserts invitations
+ * For delete is also possible:
+ * - /session_related_data/ erases all the tables that should be attached to one session
  */
 public class ContentProvider extends android.content.ContentProvider {
 
@@ -70,6 +72,7 @@ public class ContentProvider extends android.content.ContentProvider {
     static final int REASONS = 400;
     static final int APPOINTMENT_TYPES = 500;
     static final int INVITATIONS = 600;
+    static final int SESSION_RELATED_DATA = 700;
 
     static UriMatcher buildUriMatcher() {
         UriMatcher nUM = new UriMatcher(UriMatcher.NO_MATCH);
@@ -95,6 +98,8 @@ public class ContentProvider extends android.content.ContentProvider {
         nUM.addURI(DBContract.CONTENT_AUTHORITY, DBContract.PATH_APPOINTMENT_TYPES, APPOINTMENT_TYPES);
 
         nUM.addURI(DBContract.CONTENT_AUTHORITY, DBContract.PATH_INVITATIONS, INVITATIONS);
+
+        nUM.addURI(DBContract.CONTENT_AUTHORITY, "session_related_data", SESSION_RELATED_DATA);
         return nUM;
     }
 
@@ -445,7 +450,7 @@ public class ContentProvider extends android.content.ContentProvider {
         db.beginTransaction();
         try {
             for (ContentValues cv : values) {
-                long newID = db.insertOrThrow(tableAndUri[0], null, cv);
+                long newID = db.insertWithOnConflict(tableAndUri[0], null, cv, SQLiteDatabase.CONFLICT_REPLACE);
                 if (newID <= 0) {
                     throw new SQLException("Failed to insert row into " + uri);
                 }
@@ -510,6 +515,13 @@ public class ContentProvider extends android.content.ContentProvider {
             case INVITATIONS:
                 table = InvitationsEntry.TABLE_NAME;
                 break;
+            case SESSION_RELATED_DATA:
+                int deleted = 0;
+                deleted += delete(AppointmentsEntry.CONTENT_URI, null, null);
+                deleted += delete(PropositionsEntry.CONTENT_URI, null, null);
+                deleted += delete(InvitationsEntry.CONTENT_URI, null, null);
+                deleted += delete(UsersEntry.CONTENT_URI, null, null);
+                return deleted;
             default:
                 throw new IllegalArgumentException("Uri '" + uri.toString() + "' not supported.");
         }

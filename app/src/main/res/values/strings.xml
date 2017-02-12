@@ -7,6 +7,7 @@
     <string name="session_phone_key" translatable="false">session_phone</string>
     <string name="session_key_key" translatable="false">session_key</string>
     <string name="preferences_file_key" translatable="false">preferences_file</string>
+    <string name="session_users_update_done_key" translatable="false">users_update_done_key</string>
 
     <string name="logo">Logo</string>
     <string name="phone_number">Phone number:</string>
@@ -71,6 +72,9 @@
     <string name="login_failed_text">Some problem during login.</string>
     <string name="api_url">Api url…</string>
     <string name="changing_api_url">Changing API url…</string>
+    <string name="pref_close_session_key">pref_close_session</string>
+    <string name="close_session_title">Close session</string>
+    <string name="close_session_summary">Close the current user session</string>
 
     <plurals name="withs_and_x_more">
         <item quantity="one">" and %d more"</item>

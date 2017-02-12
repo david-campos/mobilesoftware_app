@@ -36,6 +36,16 @@
         android:layout_centerVertical="true"
         android:visibility="gone" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/tv_loginInfo"
+        android:layout_gravity="center_horizontal"
+        android:layout_below="@+id/pb_doing_login_bar"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone" />
+
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

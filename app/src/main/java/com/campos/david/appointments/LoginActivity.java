@@ -19,13 +19,15 @@ import android.widget.TextView;
 
 import com.campos.david.appointments.activityMain.MainActivity;
 import com.campos.david.appointments.services.ApiConnector;
+import com.campos.david.appointments.services.UpdateUsersService;
 
 /**
  * LoginActivity activity of the app
  */
-public class LoginActivity extends AppCompatActivity implements ApiUrlDialog.NoticeDialogListener {
+public class LoginActivity extends AppCompatActivity {
     private EditText mEditText;
     private TextView mLabel;
+    private TextView mInfoTV;
     private ProgressBar mLoadBar;
     private Button mLoginButton;
     private ColorStateList mOriginalForegroundColors;
@@ -47,11 +49,23 @@ public class LoginActivity extends AppCompatActivity implements ApiUrlDialog.Not
 
         mSession = getSharedPreferences(getString(R.string.session_file_key), Context.MODE_PRIVATE);
         String session_key = mSession.getString(getString(R.string.session_key_key), null);
-        if (session_key != null) {
+        Boolean firstUpdateDone = mSession.getBoolean(getString(R.string.session_users_update_done_key), false);
+        if (session_key != null && firstUpdateDone) {
             throwMainActivity();
+            return;
+        }
+
+        setContentView(R.layout.activity_login);
+
+        mEditText = (EditText) findViewById(R.id.etPhoneNumberInput);
+        mLoginButton = (Button) findViewById(R.id.btnLogin);
+        mLabel = (TextView) findViewById(R.id.tvTextPhoneNumber);
+        mLoadBar = (ProgressBar) findViewById(R.id.pb_doing_login_bar);
+        mInfoTV = (TextView) findViewById(R.id.tv_loginInfo);
+
+        if (session_key != null) {
+            new DoLoginTask(this).execute("");
         } else {
-            setContentView(R.layout.activity_login);
-            mEditText = (EditText) findViewById(R.id.etPhoneNumberInput);
             mOriginalForegroundColors = mEditText.getTextColors();
             mEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                 @Override
@@ -61,14 +75,12 @@ public class LoginActivity extends AppCompatActivity implements ApiUrlDialog.Not
                     }
                 }
             });
-            mLoginButton = (Button) findViewById(R.id.btnLogin);
             mLoginButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     login(mEditText.getText().toString());
                 }
             });
-            mLabel = (TextView) findViewById(R.id.tvTextPhoneNumber);
             final GestureDetector gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
                 public void onLongPress(MotionEvent e) {
                     ApiUrlDialog dialog = new ApiUrlDialog();
@@ -81,13 +93,12 @@ public class LoginActivity extends AppCompatActivity implements ApiUrlDialog.Not
                     return gestureDetector.onTouchEvent(event);
                 }
             });
-            mLoadBar = (ProgressBar) findViewById(R.id.pb_doing_login_bar);
         }
     }
 
     private void login(String phone) {
         if (phone != null) {
-            phone = phone.replaceAll("[ .-]", "");
+            phone = phone.replaceAll("[ \\.\\-\\(\\)]", "");
             if (phone.matches("\\+?.+")) {
                 new DoLoginTask(this).execute(phone);
                 return;
@@ -96,16 +107,7 @@ public class LoginActivity extends AppCompatActivity implements ApiUrlDialog.Not
         mEditText.setBackgroundColor(getResources().getColor(R.color.backgroundIncorrectField));
     }
 
-    @Override
-    public void newApiUrl(String newUrl) {
-        SharedPreferences prefs = getSharedPreferences(getString(R.string.preferences_file_key),
-                Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(getString(R.string.api_uri_key), newUrl);
-        editor.commit();
-    }
-
-    private class DoLoginTask extends AsyncTask<String, Void, Boolean> {
+    private class DoLoginTask extends AsyncTask<String, String, Boolean> {
         private Context mContext;
 
         public DoLoginTask(Context context) {
@@ -118,23 +120,50 @@ public class LoginActivity extends AppCompatActivity implements ApiUrlDialog.Not
             mLabel.setVisibility(View.GONE);
             mEditText.setVisibility(View.GONE);
             mLoadBar.setVisibility(View.VISIBLE);
+            mInfoTV.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            if (values.length > 0 && values[0] != null) {
+                mInfoTV.setText(values[0]);
+            }
         }
 
         @Override
         protected Boolean doInBackground(String... params) {
-            if (params.length < 0) {
-                return false;
+            String session_key = mSession.getString(getString(R.string.session_key_key), null);
+            if (session_key == null) {
+                publishProgress("Creating session...");
+                if (params.length < 0) {
+                    return false;
+                }
+                ApiConnector connector = new ApiConnector(mContext);
+                Pair<Integer, String> result = connector.login(params[0]);
+                if (result == null) {
+                    return false;
+                }
+                SharedPreferences.Editor editor = mSession.edit();
+                editor.putInt(mContext.getString(R.string.session_id_key), result.first);
+                editor.putString(mContext.getString(R.string.session_key_key), result.second);
+                editor.putString(mContext.getString(R.string.session_phone_key), params[0]);
+                editor.commit();
             }
-            ApiConnector connector = new ApiConnector(mContext);
-            Pair<Integer, String> result = connector.login(params[0]);
-            if (result == null) {
-                return false;
+
+            //TODO: update types and reasons
+
+            Boolean firstUpdateDone = mSession.getBoolean(getString(R.string.session_users_update_done_key), false);
+            if (!firstUpdateDone) {
+                publishProgress("Updating users...");
+                try {
+                    UpdateUsersService.usersUpdate(LoginActivity.this);
+                    SharedPreferences.Editor editor = mSession.edit();
+                    editor.putBoolean(mContext.getString(R.string.session_users_update_done_key), true);
+                    editor.commit();
+                } catch (NullPointerException e) {
+                    // Some problem with the API. Ignore, we will try next time!
+                }
             }
-            SharedPreferences.Editor editor = mSession.edit();
-            editor.putInt(mContext.getString(R.string.session_id_key), result.first);
-            editor.putString(mContext.getString(R.string.session_key_key), result.second);
-            editor.putString(mContext.getString(R.string.session_phone_key), params[0]);
-            editor.commit();
             return true;
         }
 
@@ -143,10 +172,11 @@ public class LoginActivity extends AppCompatActivity implements ApiUrlDialog.Not
             if (result) {
                 throwMainActivity();
             } else {
-//                mLoginButton.setVisibility(View.VISIBLE);
-//                mLabel.setVisibility(View.VISIBLE);
-//                mEditText.setVisibility(View.VISIBLE);
-//                mLoadBar.setVisibility(View.GONE);
+                mLoginButton.setVisibility(View.VISIBLE);
+                mLabel.setVisibility(View.VISIBLE);
+                mEditText.setVisibility(View.VISIBLE);
+                mLoadBar.setVisibility(View.GONE);
+                mInfoTV.setVisibility(View.GONE);
                 onLoginError();
             }
         }

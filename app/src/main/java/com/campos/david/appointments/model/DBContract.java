@@ -17,6 +17,8 @@ public class DBContract {
      * Base Uri to get content in this app
      */
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+    public static final Uri SESSION_RELATED_DATA_URI = BASE_CONTENT_URI.buildUpon()
+            .appendPath("session_related_data").build();
 
     public static final String PATH_USERS = "users";
     public static final String PATH_APPOINTMENT_TYPES = "appointmentTypes";

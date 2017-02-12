@@ -14,7 +14,7 @@ import android.view.MenuItem;
 
 import com.campos.david.appointments.AboutActivity;
 import com.campos.david.appointments.R;
-import com.campos.david.appointments.activitySettings.SettingsActivity;
+import com.campos.david.appointments.activitySettings.SettingsFragment;
 import com.campos.david.appointments.model.DBContract;
 
 import java.util.ArrayList;
@@ -69,8 +69,10 @@ public class MainActivity extends AppCompatActivity {
 
         switch (id) {
             case R.id.action_settings:
-                Intent throwSettingsIntent = new Intent(getApplicationContext(), SettingsActivity.class);
-                startActivity(throwSettingsIntent);
+                // Display the settings as the main content.
+                getFragmentManager().beginTransaction()
+                        .replace(android.R.id.content, new SettingsFragment())
+                        .commit();
                 return true;
             case R.id.action_about:
                 Intent throwAboutIntent = new Intent(getApplicationContext(), AboutActivity.class);

@@ -16,6 +16,9 @@
     <PreferenceCategory
         android:icon="@drawable/ic_sync_black_24dp"
         android:title="@string/pref_header_profile">
-
+        <Preference
+            android:key="@string/pref_close_session_key"
+            android:title="@string/close_session_title"
+            android:summary="@string/close_session_summary" />
     </PreferenceCategory>
 </PreferenceScreen>

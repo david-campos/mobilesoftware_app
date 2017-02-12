@@ -5,15 +5,23 @@
     <string name="query_request_key">req</string>
     <string name="query_session_id_key">ses</string>
     <string name="query_appointment_id_key">aid</string>
-
+    <string name="response_id">id</string>
 
     <string name="req_init_session">ses</string>
     <string name="response_session_key_key">key</string>
     <string name="response_session_id_key">sessionId</string>
+
+    <string name="req_filter_user_list">ful</string>
+    <string name="query_param_phones">ps</string>
+    <string name="response_user_name">name</string>
+    <string name="response_user_phone">phone</string>
+    <string name="response_user_picture">picture_id</string>
+    <string name="response_user_blocked">blocked</string>
 
     <integer name="response_error_code">500</integer>
 
     <string name="response_result_key">result</string>
     <string name="response_error_key">error</string>
     <string name="response_error_code_key">code</string>
+    <string name="api_protocol">http://</string>
 </resources>

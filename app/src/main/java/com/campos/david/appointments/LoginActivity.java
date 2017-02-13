@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.campos.david.appointments.activityMain.MainActivity;
 import com.campos.david.appointments.services.ApiConnector;
+import com.campos.david.appointments.services.UpdateTypesAndReasonsService;
 import com.campos.david.appointments.services.UpdateUsersService;
 
 /**
@@ -50,7 +51,8 @@ public class LoginActivity extends AppCompatActivity {
         mSession = getSharedPreferences(getString(R.string.session_file_key), Context.MODE_PRIVATE);
         String session_key = mSession.getString(getString(R.string.session_key_key), null);
         Boolean firstUpdateDone = mSession.getBoolean(getString(R.string.session_users_update_done_key), false);
-        if (session_key != null && firstUpdateDone) {
+        Boolean typesAndReasonsDone = mSession.getBoolean(getString(R.string.session_types_reasons_done_key), false);
+        if (session_key != null && firstUpdateDone && typesAndReasonsDone) {
             throwMainActivity();
             return;
         }
@@ -134,7 +136,7 @@ public class LoginActivity extends AppCompatActivity {
         protected Boolean doInBackground(String... params) {
             String session_key = mSession.getString(getString(R.string.session_key_key), null);
             if (session_key == null) {
-                publishProgress("Creating session...");
+                publishProgress(getString(R.string.text_creating_session));
                 if (params.length < 0) {
                     return false;
                 }
@@ -150,11 +152,22 @@ public class LoginActivity extends AppCompatActivity {
                 editor.commit();
             }
 
-            //TODO: update types and reasons
+            Boolean typesAndReasonsDone = mSession.getBoolean(getString(R.string.session_types_reasons_done_key), false);
+            if (!typesAndReasonsDone) {
+                publishProgress(getString(R.string.text_updating_types_and_reasons));
+                try {
+                    UpdateTypesAndReasonsService.typesAndReasonsUpdate(LoginActivity.this);
+                    SharedPreferences.Editor editor = mSession.edit();
+                    editor.putBoolean(mContext.getString(R.string.session_types_reasons_done_key), true);
+                    editor.commit();
+                } catch (NullPointerException e) {
+                    // Some problem with the API. Ignore, we will try next time!
+                }
+            }
 
             Boolean firstUpdateDone = mSession.getBoolean(getString(R.string.session_users_update_done_key), false);
             if (!firstUpdateDone) {
-                publishProgress("Updating users...");
+                publishProgress(getString(R.string.text_updating_users));
                 try {
                     UpdateUsersService.usersUpdate(LoginActivity.this);
                     SharedPreferences.Editor editor = mSession.edit();

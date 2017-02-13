@@ -115,6 +115,48 @@ public class ApiConnector {
         return null;
     }
 
+    public Pair<ContentValues[], ContentValues[]> getAppointmentTypesAndReasons() {
+        ContentValues cv = new ContentValues(1);
+        cv.put(mContext.getString(R.string.query_request_key),
+                mContext.getString(R.string.req_types_and_reasons));
+        JSONObject result = getObjectFromApi(cv);
+        try {
+            JSONArray types = result.getJSONArray("appointmentTypes");
+            JSONArray reasons = result.getJSONArray("reasons");
+
+            ContentValues[] listTypes = new ContentValues[types.length()];
+            for (int i = 0; i < types.length(); i++) {
+                JSONObject type = types.getJSONObject(i);
+                ContentValues typeCv = new ContentValues(3);
+                typeCv.put(DBContract.AppointmentTypesEntry.COLUMN_NAME,
+                        type.getString(mContext.getString(R.string.response_type_name)));
+                typeCv.put(DBContract.AppointmentTypesEntry.COLUMN_DESCRIPTION,
+                        type.getString(mContext.getString(R.string.response_type_description)));
+                typeCv.put(DBContract.AppointmentTypesEntry.COLUMN_ICON,
+                        type.getInt(mContext.getString(R.string.response_type_icon)));
+                listTypes[i] = typeCv;
+                //"name" "description" "icon"
+            }
+
+            ContentValues[] listReasons = new ContentValues[reasons.length()];
+            for (int i = 0; i < reasons.length(); i++) {
+                JSONObject reason = reasons.getJSONObject(i);
+                ContentValues reasonCv = new ContentValues(3);
+                reasonCv.put(DBContract.ReasonsEntry.COLUMN_NAME,
+                        reason.getString(mContext.getString(R.string.response_reason_name)));
+                reasonCv.put(DBContract.ReasonsEntry.COLUMN_DESCRIPTION,
+                        reason.getString(mContext.getString(R.string.response_reason_description)));
+                listReasons[i] = reasonCv;
+                //"name" "description" "icon"
+            }
+
+            return new Pair<>(listTypes, listReasons);
+        } catch (JSONException e) {
+            // Shouldn't happen
+        }
+        return null;
+    }
+
     private JSONObject getObjectFromApi(ContentValues params) {
         return getFromApi(params, JSONObject.class);
     }

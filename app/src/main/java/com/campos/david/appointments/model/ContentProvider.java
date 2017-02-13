@@ -68,7 +68,7 @@ public class ContentProvider extends android.content.ContentProvider {
     static final int USERS_INVITED = 210;
     static final int USERS_WITH = 220;
     static final int PROPOSITIONS = 300;
-    static final int PROPOSITIONS_INSERTION = 310;
+    static final int PROPOSITIONS_INSERTION_OR_DELETE = 310;
     static final int REASONS = 400;
     static final int APPOINTMENT_TYPES = 500;
     static final int INVITATIONS = 600;
@@ -91,7 +91,7 @@ public class ContentProvider extends android.content.ContentProvider {
         nUM.addURI(DBContract.CONTENT_AUTHORITY, DBContract.PATH_USERS + "/with", USERS_WITH);
 
         nUM.addURI(DBContract.CONTENT_AUTHORITY, DBContract.PATH_PROPOSITIONS + "/#", PROPOSITIONS);
-        nUM.addURI(DBContract.CONTENT_AUTHORITY, DBContract.PATH_PROPOSITIONS, PROPOSITIONS_INSERTION);
+        nUM.addURI(DBContract.CONTENT_AUTHORITY, DBContract.PATH_PROPOSITIONS, PROPOSITIONS_INSERTION_OR_DELETE);
 
         nUM.addURI(DBContract.CONTENT_AUTHORITY, DBContract.PATH_REASONS, REASONS);
 
@@ -341,7 +341,7 @@ public class ContentProvider extends android.content.ContentProvider {
             case USERS_ITEM:
                 return UsersEntry.CONTENT_ITEM_TYPE;
             case PROPOSITIONS:
-            case PROPOSITIONS_INSERTION:
+            case PROPOSITIONS_INSERTION_OR_DELETE:
                 return PropositionsEntry.CONTENT_TYPE;
             case REASONS:
                 return ReasonsEntry.CONTENT_TYPE;
@@ -365,7 +365,7 @@ public class ContentProvider extends android.content.ContentProvider {
                 table = UsersEntry.TABLE_NAME;
                 returnUri = UsersEntry.CONTENT_URI.toString();
                 break;
-            case PROPOSITIONS_INSERTION:
+            case PROPOSITIONS_INSERTION_OR_DELETE:
                 table = PropositionsEntry.TABLE_NAME;
                 returnUri = PropositionsEntry.CONTENT_URI.toString();
                 break;
@@ -556,6 +556,9 @@ public class ContentProvider extends android.content.ContentProvider {
                 table = UsersEntry.TABLE_NAME;
                 selection = UsersEntry._ID + "=?";
                 selectionArgs = new String[]{uri.getLastPathSegment()};
+                break;
+            case PROPOSITIONS_INSERTION_OR_DELETE:
+                table = PropositionsEntry.TABLE_NAME;
                 break;
             case PROPOSITIONS:
                 table = PropositionsEntry.TABLE_NAME;

@@ -18,6 +18,13 @@
     <string name="response_user_picture">picture_id</string>
     <string name="response_user_blocked">blocked</string>
 
+    <string name="req_types_and_reasons">tar</string>
+    <string name="response_type_name">name</string>
+    <string name="response_type_description">description</string>
+    <string name="response_type_icon">icon</string>
+    <string name="response_reason_name">name</string>
+    <string name="response_reason_description">description</string>
+
     <integer name="response_error_code">500</integer>
 
     <string name="response_result_key">result</string>

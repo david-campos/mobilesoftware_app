@@ -1,17 +1,24 @@
 package com.campos.david.appointments;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -22,16 +29,22 @@ import com.campos.david.appointments.services.ApiConnector;
 import com.campos.david.appointments.services.UpdateTypesAndReasonsService;
 import com.campos.david.appointments.services.UpdateUsersService;
 
+import static android.Manifest.permission.READ_CONTACTS;
+
 /**
  * LoginActivity activity of the app
  */
 public class LoginActivity extends AppCompatActivity {
+    /**
+     * Id to identity READ_CONTACTS permission request.
+     */
+    private static final int REQUEST_READ_CONTACTS = 0;
+
     private EditText mEditText;
     private TextView mLabel;
     private TextView mInfoTV;
     private ProgressBar mLoadBar;
     private Button mLoginButton;
-    private ColorStateList mOriginalForegroundColors;
     private SharedPreferences mSession;
 
     private void throwMainActivity() {
@@ -68,13 +81,14 @@ public class LoginActivity extends AppCompatActivity {
         if (session_key != null) {
             new DoLoginTask(this).execute("");
         } else {
-            mOriginalForegroundColors = mEditText.getTextColors();
-            mEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            mEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                 @Override
-                public void onFocusChange(View v, boolean hasFocus) {
-                    if (hasFocus) {
-                        mEditText.setTextColor(mOriginalForegroundColors);
+                public boolean onEditorAction(TextView v, int id, KeyEvent event) {
+                    if (id == R.id.login || id == EditorInfo.IME_NULL) {
+                        login(mEditText.getText().toString());
+                        return true;
                     }
+                    return false;
                 }
             });
             mLoginButton.setOnClickListener(new View.OnClickListener() {
@@ -106,7 +120,98 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
         }
-        mEditText.setBackgroundColor(getResources().getColor(R.color.backgroundIncorrectField));
+        mEditText.setError(getString(R.string.invalid_phone));
+        mEditText.requestFocus();
+    }
+
+    private boolean mayRequestContacts() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return true;
+        }
+        if (checkSelfPermission(READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        }
+        requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
+        return false;
+    }
+
+    /**
+     * Callback received when a permissions request has been completed.
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_READ_CONTACTS) {
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                (new DoLoginTask(this)).execute("");
+            }
+        }
+    }
+
+
+    /**
+     * Shows the progress UI and hides the login form.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            mLoginButton.setVisibility(show ? View.GONE : View.VISIBLE);
+            mLoginButton.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mLoginButton.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+            mLabel.setVisibility(show ? View.GONE : View.VISIBLE);
+            mLabel.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mLabel.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+            mEditText.setVisibility(show ? View.GONE : View.VISIBLE);
+            mEditText.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mEditText.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+
+            mLoadBar.setVisibility(show ? View.VISIBLE : View.GONE);
+            mLoadBar.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mLoadBar.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+            mInfoTV.setVisibility(show ? View.VISIBLE : View.GONE);
+            mInfoTV.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mInfoTV.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mLoginButton.setVisibility(show ? View.VISIBLE : View.GONE);
+            mEditText.setVisibility(show ? View.VISIBLE : View.GONE);
+            mLabel.setVisibility(show ? View.VISIBLE : View.GONE);
+
+            mLoadBar.setVisibility(show ? View.GONE : View.VISIBLE);
+            mInfoTV.setVisibility(show ? View.GONE : View.VISIBLE);
+        }
     }
 
     private class DoLoginTask extends AsyncTask<String, String, Boolean> {
@@ -118,11 +223,7 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
-            mLoginButton.setVisibility(View.GONE);
-            mLabel.setVisibility(View.GONE);
-            mEditText.setVisibility(View.GONE);
-            mLoadBar.setVisibility(View.VISIBLE);
-            mInfoTV.setVisibility(View.VISIBLE);
+            showProgress(true);
         }
 
         @Override
@@ -166,7 +267,7 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             Boolean firstUpdateDone = mSession.getBoolean(getString(R.string.session_users_update_done_key), false);
-            if (!firstUpdateDone) {
+            if (!firstUpdateDone && mayRequestContacts()) {
                 publishProgress(getString(R.string.text_updating_users));
                 try {
                     UpdateUsersService.usersUpdate(LoginActivity.this);
@@ -185,11 +286,7 @@ public class LoginActivity extends AppCompatActivity {
             if (result) {
                 throwMainActivity();
             } else {
-                mLoginButton.setVisibility(View.VISIBLE);
-                mLabel.setVisibility(View.VISIBLE);
-                mEditText.setVisibility(View.VISIBLE);
-                mLoadBar.setVisibility(View.GONE);
-                mInfoTV.setVisibility(View.GONE);
+                showProgress(false);
                 onLoginError();
             }
         }

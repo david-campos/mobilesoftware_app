@@ -79,6 +79,8 @@
     <string name="text_updating_users">Updating users...</string>
     <string name="text_updating_types_and_reasons">Updating types and reasons...</string>
     <string name="text_creating_session">Creating session...</string>
+    <string name="invalid_phone">Invalid phone number</string>
+    <string name="action_sign_in_short">Sign in</string>
 
     <plurals name="withs_and_x_more">
         <item quantity="one">" and %d more"</item>

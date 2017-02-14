@@ -515,11 +515,14 @@ public class ContentProvider extends android.content.ContentProvider {
             case INVITATIONS:
                 table = InvitationsEntry.TABLE_NAME;
                 break;
+            case PROPOSITIONS_INSERTION_OR_DELETE:
+                table = PropositionsEntry.TABLE_NAME;
+                break;
             case SESSION_RELATED_DATA:
                 int deleted = 0;
-                deleted += delete(AppointmentsEntry.CONTENT_URI, null, null);
                 deleted += delete(PropositionsEntry.CONTENT_URI, null, null);
                 deleted += delete(InvitationsEntry.CONTENT_URI, null, null);
+                deleted += delete(AppointmentsEntry.CONTENT_URI, null, null);
                 deleted += delete(UsersEntry.CONTENT_URI, null, null);
                 return deleted;
             default:
@@ -556,9 +559,6 @@ public class ContentProvider extends android.content.ContentProvider {
                 table = UsersEntry.TABLE_NAME;
                 selection = UsersEntry._ID + "=?";
                 selectionArgs = new String[]{uri.getLastPathSegment()};
-                break;
-            case PROPOSITIONS_INSERTION_OR_DELETE:
-                table = PropositionsEntry.TABLE_NAME;
                 break;
             case PROPOSITIONS:
                 table = PropositionsEntry.TABLE_NAME;

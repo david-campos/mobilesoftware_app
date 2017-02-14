@@ -65,6 +65,8 @@
             android:name=".services.UpdateTypesAndReasonsService"
             android:enabled="true"
             android:exported="false" />
+
+        <activity android:name=".NewAppointmentActivity"></activity>
     </application>
 
 </manifest>

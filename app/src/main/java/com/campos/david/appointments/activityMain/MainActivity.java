@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
@@ -11,8 +12,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.campos.david.appointments.AboutActivity;
+import com.campos.david.appointments.NewAppointmentActivity;
 import com.campos.david.appointments.R;
 import com.campos.david.appointments.activitySettings.SettingsFragment;
 import com.campos.david.appointments.model.DBContract;
@@ -32,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
+        FloatingActionButton fabNewAppointment =
+                (FloatingActionButton) findViewById(R.id.fab_newAppointment);
 
         if (viewPager != null && tabLayout != null) {
             // Set PagerAdapter so that it can display items
@@ -40,6 +45,16 @@ public class MainActivity extends AppCompatActivity {
             viewPager.setCurrentItem(1);
             // Give the TabLayout the ViewPager
             tabLayout.setupWithViewPager(viewPager);
+        }
+
+        if (fabNewAppointment != null) {
+            fabNewAppointment.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent newAppointment = new Intent(getApplicationContext(), NewAppointmentActivity.class);
+                    startActivity(newAppointment);
+                }
+            });
         }
     }
 
@@ -94,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                     // Insert 10 users
                     List<Uri> users = new ArrayList<>();
                     for (int i = 1; i <= 10; i++) {
-                        users.add(addUser(i, names[i - 1], Integer.toString(666000000 + i), 0, Math.random() < 0.35));
+                        users.add(addUser(1000 + i, names[i - 1], Integer.toString(666000000 + i), 0, Math.random() < 0.35));
                     }
                     // Insert 50 random appointments
                     for (int i = 1; i <= 50; i++) {

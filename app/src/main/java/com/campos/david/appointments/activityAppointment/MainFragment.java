@@ -42,6 +42,8 @@ import java.text.SimpleDateFormat;
 public class MainFragment extends Fragment implements OnMapReadyCallback, LoaderManager.LoaderCallbacks<Cursor> {
     public static final int LOADER_APPOINTMENT = 0;
 
+    private static final String TAG = MainFragment.class.getSimpleName();
+
     private static final String[] PROJECTION = {
             DBContract.AppointmentsEntry.TABLE_NAME + "." + DBContract.AppointmentsEntry.COLUMN_DESCRIPTION,
             DBContract.PropositionsEntry.TABLE_NAME + "." + DBContract.PropositionsEntry.COLUMN_PLACE_LON,
@@ -246,11 +248,12 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Loader
                 long timestamp = mCurrentCursor.getLong(COL_TIMESTAMP);
 
                 // For dropping a marker at a point on the Map
+                float hash = (mAppointmentId * 2267 % 36000) / 100.0f;
                 LatLng pos = new LatLng(coordsLat, coordsLon);
                 mMap.addMarker(new MarkerOptions()
                         .position(pos)
                         .title(place)
-                        .icon(BitmapDescriptorFactory.defaultMarker((float) Math.random() * 360))
+                        .icon(BitmapDescriptorFactory.defaultMarker(hash))
                         .snippet(SimpleDateFormat.getDateTimeInstance(
                                 java.text.SimpleDateFormat.LONG, SimpleDateFormat.SHORT)
                                 .format(timestamp)));
@@ -292,8 +295,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Loader
                 public void onClick(View v) {
                     snack.dismiss();
                 }
-            })
-                    .show();
+            }).show();
         }
     }
 
@@ -309,28 +311,29 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Loader
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mMapView != null)
+        if (mWithMap && mMapView != null)
             mMapView.onDestroy();
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (mMapView != null)
+        if (mWithMap && mMapView != null)
             mMapView.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        if (mMapView != null)
+        if (mWithMap && mMapView != null)
             mMapView.onPause();
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        if (mMapView != null)
+        if (mWithMap && mMapView != null)
             mMapView.onLowMemory();
     }
 
@@ -418,7 +421,6 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Loader
                         break;
                 }
             }
-
             updateMap();
         }
     }

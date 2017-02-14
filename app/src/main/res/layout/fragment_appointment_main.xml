@@ -1,93 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:map="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/appointment_linear_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingBottom="60dp">
+    android:layout_height="match_parent">
 
-    <com.google.android.gms.maps.MapView
-        android:id="@+id/mapView"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="218dp"
-        map:cameraZoom="13"
-        map:liteMode="true"
-        map:mapType="normal" />
-
-    <TextView
-        android:id="@+id/tv_address"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/textColorPrimary" />
+        android:id="@+id/appointment_linear_layout"
+        android:orientation="vertical"
+        android:paddingBottom="60dp">
 
-    <TextView
-        android:id="@+id/tv_description"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_access_time"
-            android:tint="@color/colorAccent"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:id="@+id/iv_timeIcon" />
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/mapView"
+            android:layout_width="match_parent"
+            android:layout_height="218dp"
+            map:cameraZoom="13"
+            map:liteMode="true"
+            map:mapType="normal" />
 
         <TextView
-            android:id="@+id/tv_timestamp"
+            android:id="@+id/tv_address"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/colorAccent"
-            android:layout_toRightOf="@+id/iv_timeIcon"
-            android:layout_toEndOf="@+id/iv_timeIcon"
-            android:layout_marginLeft="4dp"
-            android:layout_marginStart="4dp"
-            android:layout_alignBottom="@+id/iv_timeIcon" />
-    </RelativeLayout>
+            android:textColor="@color/textColorPrimary" />
 
-    <Button
-        android:id="@+id/btn_closeDiscussion"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:drawableLeft="@drawable/ic_event_busy"
-        android:drawableStart="@drawable/ic_event_busy"
-        android:text="@string/close_discussion" />
+        <TextView
+            android:id="@+id/tv_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <Button
-        android:id="@+id/btn_acceptInvitation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:drawableLeft="@drawable/ic_done"
-        android:drawableStart="@drawable/ic_done"
-        android:text="@string/text_accept_invitation" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
-    <Button
-        android:id="@+id/btn_suggestChange"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:drawableLeft="@drawable/ic_edit"
-        android:drawableStart="@drawable/ic_edit"
-        android:text="@string/suggest_change" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_access_time"
+                android:tint="@color/colorAccent"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:id="@+id/iv_timeIcon"
+                android:contentDescription="@string/clock_icon_description" />
 
-    <Button
-        android:id="@+id/btn_refuseInvitation"
-        android:layout_width="match_parent"
-        android:layout_gravity="bottom"
-        android:drawableLeft="@drawable/ic_clear"
-        android:drawableStart="@drawable/ic_clear"
-        android:text="@string/refuse"
-        android:layout_height="wrap_content" />
-</LinearLayout>
+            <TextView
+                android:id="@+id/tv_timestamp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/colorAccent"
+                android:layout_toRightOf="@+id/iv_timeIcon"
+                android:layout_toEndOf="@+id/iv_timeIcon"
+                android:layout_marginLeft="4dp"
+                android:layout_marginStart="4dp"
+                android:layout_alignBottom="@+id/iv_timeIcon" />
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/btn_closeDiscussion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:drawableLeft="@drawable/ic_event_busy"
+            android:drawableStart="@drawable/ic_event_busy"
+            android:text="@string/close_discussion" />
+
+        <Button
+            android:id="@+id/btn_acceptInvitation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:drawableLeft="@drawable/ic_done"
+            android:drawableStart="@drawable/ic_done"
+            android:text="@string/text_accept_invitation" />
+
+        <Button
+            android:id="@+id/btn_suggestChange"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:drawableLeft="@drawable/ic_edit"
+            android:drawableStart="@drawable/ic_edit"
+            android:text="@string/suggest_change" />
+
+        <Button
+            android:id="@+id/btn_refuseInvitation"
+            android:layout_width="match_parent"
+            android:layout_gravity="bottom"
+            android:drawableLeft="@drawable/ic_clear"
+            android:drawableStart="@drawable/ic_clear"
+            android:text="@string/refuse"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</ScrollView>

@@ -89,11 +89,15 @@ public class AboutActivity extends AppCompatActivity {
         private Context mContext;
 
         private int mBackgroundColor;
+        private float mConstantDownCameraSpeed = 0.0f;
         private float mCameraSpeed = 0.0f;
+        private int mWidth = 0;
+        private int mHeight = 0;
         private Paint mPaintTexts;
         private Text[] mTexts;
         private Rect mCameraRect;
         private Point mCameraDestiny = null;
+        private boolean mDoConstantDown = true;
 
         public void onResume() {
             synchronized (mSync) {
@@ -123,6 +127,7 @@ public class AboutActivity extends AppCompatActivity {
                 mCameraDestiny = new Point(
                         Math.round(mCameraRect.left + x - centerX),
                         Math.round(mCameraRect.top + y - centerY));
+                mDoConstantDown = false;
             }
         }
 
@@ -135,12 +140,29 @@ public class AboutActivity extends AppCompatActivity {
             mPaintTexts = new Paint(Paint.ANTI_ALIAS_FLAG);
             mPaintTexts.setColor(mContext.getResources().getColor(R.color.textColorOverPrimary));
             mPaintTexts.setTextAlign(Paint.Align.CENTER);
-            mTexts = new Text[]{
-                    new Text(0, 0, mContext.getString(R.string.app_name), 25),
-                    new Text(0, 35, mContext.getString(R.string.text_author, mContext.getString(R.string.author)), 20),
-                    new Text(0, 65, mContext.getString(R.string.author_mail), 20),
-                    new Text(0, 95, GoogleApiAvailability.getInstance().getOpenSourceSoftwareLicenseInfo(mContext), 12)
-            };
+            String licenseInfoStr = GoogleApiAvailability.getInstance().getOpenSourceSoftwareLicenseInfo(mContext);
+            String[] licenseInfo;
+            float sizeProportion = 6.0f;
+            if (licenseInfoStr != null) {
+                licenseInfo = licenseInfoStr.split("\n");
+
+                mTexts = new Text[licenseInfo.length + 3]; // Change also in else clause
+                int widest = 0;
+                for (String aLicenseInfo : licenseInfo) {
+                    if (aLicenseInfo.length() > widest)
+                        widest = aLicenseInfo.length();
+                }
+                sizeProportion = (mWidth * 1.1f) / widest;
+                for (int i = 0; i < licenseInfo.length; i++) {
+                    mTexts[i + 3] = new Text(0, (int) Math.round(95 + 2.1 * sizeProportion * i), licenseInfo[i], 2 * sizeProportion);
+                }
+            } else {
+                mTexts = new Text[3]; // Change also in if clause
+            }
+            mTexts[0] = new Text(0, 0, mContext.getString(R.string.app_name), 4 * sizeProportion);
+            mTexts[1] = new Text(0, 35, mContext.getString(R.string.text_author, mContext.getString(R.string.author)), 3 * sizeProportion);
+            mTexts[2] = new Text(0, 65, mContext.getString(R.string.author_mail), 3 * sizeProportion);
+
         }
 
         @Override
@@ -240,12 +262,13 @@ public class AboutActivity extends AppCompatActivity {
                         mCameraRect.offsetTo(mCameraRect.left, mCameraDestiny.y);
                     } else {
                         mCameraRect.offset(0, speed.y);
-
                     }
 
                     if (inX && inY) {
                         mCameraDestiny = null;
                     }
+                } else if (mDoConstantDown) {
+                    mCameraRect.offset(0, Math.round(mConstantDownCameraSpeed * millisDelta));
                 }
             }
         }
@@ -257,7 +280,10 @@ public class AboutActivity extends AppCompatActivity {
                     if (text.text != null) {
                         mPaintTexts.setTextSize(text.size);
                         Point pos = toCameraCoordinates(text.posX, text.posY);
-                        canvas.drawText(text.text, pos.x, pos.y, mPaintTexts);
+                        float margin = 1.1f * text.size;
+                        if (pos.y > -margin && pos.y < mHeight + margin) {
+                            canvas.drawText(text.text, pos.x, pos.y, mPaintTexts);
+                        }
                     }
                 }
                 // For debug
@@ -290,9 +316,12 @@ public class AboutActivity extends AppCompatActivity {
             synchronized (mSync) {
                 mSurface = surface;
                 synchronized (mCameraLock) {
+                    mConstantDownCameraSpeed = height / 20000.0f; // One height each twenty seconds
                     mCameraSpeed = width / 1000.0f; // One complete width each second
                     int x = -width / 2;
                     int y = -height / 2;
+                    mWidth = width;
+                    mHeight = height;
                     mCameraRect = new Rect(x, y, x + width, y + height);
                 }
                 mSync.notify();
@@ -302,7 +331,10 @@ public class AboutActivity extends AppCompatActivity {
         @Override // Called on UI thread
         public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
             synchronized (mCameraLock) {
+                mConstantDownCameraSpeed = height / 20000.0f; // One height each twenty seconds
                 mCameraSpeed = width / 1000.0f; // One complete width each second
+                mWidth = width;
+                mHeight = height;
                 mCameraRect.set(mCameraRect.left, mCameraRect.top,
                         mCameraRect.left + width, mCameraRect.top + height);
             }

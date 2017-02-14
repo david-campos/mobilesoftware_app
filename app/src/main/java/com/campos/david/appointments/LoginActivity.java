@@ -136,7 +136,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     * Callback received when a permissions request has been completed.
+     * Callbacks received when a permissions request has been completed.
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,

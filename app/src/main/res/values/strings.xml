@@ -82,9 +82,13 @@
     <string name="invalid_phone">Invalid phone number</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="clock_icon_description">Clock icon representing the time of the appointment</string>
+    <string name="action_done">Done</string>
 
     <plurals name="withs_and_x_more">
         <item quantity="one">" and %d more"</item>
         <item quantity="other">" and %d more"</item>
     </plurals>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

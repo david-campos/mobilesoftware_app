@@ -15,8 +15,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.campos.david.appointments.AboutActivity;
-import com.campos.david.appointments.NewAppointmentActivity;
 import com.campos.david.appointments.R;
+import com.campos.david.appointments.activityNewAppointment.NewAppointmentActivity;
 import com.campos.david.appointments.activitySettings.SettingsFragment;
 import com.campos.david.appointments.model.DBContract;
 

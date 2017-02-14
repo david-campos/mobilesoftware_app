@@ -9,7 +9,7 @@
     <color name="colorAccent">#64DD17</color>
     <color name="rippleLight">#ffffffff</color>
 
-    <color name="backgroundIncorrectField">#ef5350</color>
+    <color name="colorSelectedUser">#20999999</color>
     <color name="btnRefused">#C2383B</color>
     <color name="btnClosed">#64DD17</color>
     <color name="colorTime">#4c4c4c</color>

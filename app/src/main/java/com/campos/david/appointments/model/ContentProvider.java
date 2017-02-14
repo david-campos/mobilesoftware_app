@@ -159,6 +159,7 @@ public class ContentProvider extends android.content.ContentProvider {
                                 "( %s ) AND ( %s )",
                                 selection, mySelection):
                         mySelection;
+                groupBy = AppointmentsEntry.TABLE_NAME + "." + AppointmentsEntry._ID;
                 break; }
             case APPOINTMENTS_PENDING: {
                 tableName = String.format(
@@ -177,6 +178,7 @@ public class ContentProvider extends android.content.ContentProvider {
                                 "( %s ) AND ( %s )",
                                 selection, mySelection):
                         mySelection;
+                groupBy = AppointmentsEntry.TABLE_NAME + "." + AppointmentsEntry._ID;
                 break; }
             case APPOINTMENTS_REFUSED:{
                 tableName = String.format(
@@ -195,6 +197,7 @@ public class ContentProvider extends android.content.ContentProvider {
                             "( %s ) AND ( %s )",
                             selection, mySelection):
                         mySelection;
+                groupBy = AppointmentsEntry.TABLE_NAME + "." + AppointmentsEntry._ID;
                 break; }
             case USERS:
                 tableName = UsersEntry.TABLE_NAME;

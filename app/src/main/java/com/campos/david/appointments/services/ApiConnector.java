@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.campos.david.appointments.R;
 import com.campos.david.appointments.model.DBContract;
+import com.campos.david.appointments.model.DBContract.UsersEntry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -93,19 +94,7 @@ public class ApiConnector {
             try {
                 ContentValues[] list = new ContentValues[result.length()];
                 for (int i = 0; i < result.length(); i++) {
-                    JSONObject user = result.getJSONObject(i);
-                    ContentValues userCv = new ContentValues(4);
-                    userCv.put(DBContract.UsersEntry._ID,
-                            user.getInt(mContext.getString(R.string.response_id)));
-                    userCv.put(DBContract.UsersEntry.COLUMN_NAME,
-                            user.getString(mContext.getString(R.string.response_user_name)));
-                    userCv.put(DBContract.UsersEntry.COLUMN_PHONE,
-                            user.getString(mContext.getString(R.string.response_user_phone)));
-                    userCv.put(DBContract.UsersEntry.COLUMN_PICTURE,
-                            user.getInt(mContext.getString(R.string.response_user_picture)));
-                    userCv.put(DBContract.UsersEntry.COLUMN_BLOCKED,
-                            user.getBoolean(mContext.getString(R.string.response_user_blocked)));
-                    list[i] = userCv;
+                    list[i] = userJsonToContentValues(result.getJSONObject(i));
                 }
                 return list;
             } catch (JSONException e) {
@@ -113,6 +102,69 @@ public class ApiConnector {
             }
         }
         return null;
+    }
+
+    public ContentValues userJsonToContentValues(@NonNull JSONObject user) throws JSONException {
+        ContentValues userCv = new ContentValues(5);
+
+        // Get the keys as defined in api_interface.xml
+        String idKey = mContext.getString(R.string.response_id);
+        String nameKey = mContext.getString(R.string.response_user_name);
+        String phoneKey = mContext.getString(R.string.response_user_phone);
+        String pictureKey = mContext.getString(R.string.response_user_picture);
+        String blockedKey = mContext.getString(R.string.response_user_blocked);
+
+        // Add all that we can find in the JSON
+        if (user.has(idKey)) userCv.put(UsersEntry._ID, user.getInt(idKey));
+        if (user.has(nameKey)) userCv.put(UsersEntry.COLUMN_NAME, user.getString(nameKey));
+        if (user.has(phoneKey)) userCv.put(UsersEntry.COLUMN_PHONE, user.getString(phoneKey));
+        if (user.has(pictureKey)) userCv.put(UsersEntry.COLUMN_PICTURE, user.getInt(pictureKey));
+        if (user.has(blockedKey))
+            userCv.put(UsersEntry.COLUMN_BLOCKED, user.getBoolean(blockedKey));
+
+        return userCv;
+    }
+
+    /**
+     * Tries to create an appointment connecting to the API and returns the appointment
+     * returned.
+     *
+     * @param invitations list of ids of invited users
+     * @param name        name of the appointment
+     * @param description description of the appointment
+     * @param closed      whether the discussion is closed or not
+     * @param type        type of appointment
+     * @param timestamp   timestamp of the appointment, already in api format and GMT time
+     * @param place       name of the place of the appointment
+     * @param latitude    latitude of the place of the appointment
+     * @param longitude   longitude of the place of the appointment
+     * @return Pair of ContentValues for appointment and current proposition, in this order
+     */
+    public JSONObject createAppointment(@NonNull String[] invitations, @NonNull String name,
+                                        @NonNull String description, boolean closed, @NonNull String type,
+                                        @NonNull String timestamp, @NonNull String place,
+                                        double latitude, double longitude) {
+        ContentValues cv = new ContentValues();
+        cv.put(mContext.getString(R.string.query_appointment_name), name);
+        cv.put(mContext.getString(R.string.query_appointment_description), description);
+        cv.put(mContext.getString(R.string.query_appointment_closed), closed);
+        cv.put(mContext.getString(R.string.query_appointment_type), type);
+        cv.put(mContext.getString(R.string.query_appointment_timestamp), timestamp);
+        cv.put(mContext.getString(R.string.query_appointment_place), place);
+        cv.put(mContext.getString(R.string.query_appointment_latitude), latitude);
+        cv.put(mContext.getString(R.string.query_appointment_longitude), longitude);
+        StringBuilder builder = new StringBuilder();
+        int last = invitations.length - 1;
+        for (int i = 0; i < invitations.length; i++) {
+            builder.append(invitations[i]);
+            if (i == last) {
+                break;
+            }
+            builder.append(",");
+        }
+        cv.put(mContext.getString(R.string.query_appointment_invited_users), builder.toString());
+        cv.put(mContext.getString(R.string.query_request_key), mContext.getString(R.string.req_new_appointment));
+        return getObjectFromApi(cv);
     }
 
     public Pair<ContentValues[], ContentValues[]> getAppointmentTypesAndReasons() {
@@ -183,12 +235,16 @@ public class ApiConnector {
             JSONObject response = new JSONObject(jsonStr);
             // Performance info (ignored)
             // JSONObject performance = response.getJSONObject("performance_info");
-            if (urlConnection.getResponseCode() == mContext.getResources().getInteger(
-                    R.integer.response_error_code)) {
+            if (!response.has(mContext.getString(R.string.response_status_key))) {
+                Log.e(TAG, "The response contains not status");
+                return null;
+            }
+            if (response.getString(mContext.getString(R.string.response_status_key)).equals(mContext.getString(R.string.response_status_error))) {
                 JSONObject errorInfo = response.getJSONObject(mContext.getString(R.string.response_result_key));
                 // Here we can throw a different error following the code of API error
                 throw new ApiError(
-                        errorInfo.getString(mContext.getString(R.string.response_error_key)),
+                        "In answer to " + connectionUri + "\n" +
+                                "API said: \n" + errorInfo.getString(mContext.getString(R.string.response_error_key)),
                         errorInfo.getInt(mContext.getString(R.string.response_error_code_key)));
             } else {
                 if (type.equals(JSONObject.class)) {

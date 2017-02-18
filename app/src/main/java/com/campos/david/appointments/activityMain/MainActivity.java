@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.campos.david.appointments.AboutActivity;
+import com.campos.david.appointments.ApiUrlDialog;
 import com.campos.david.appointments.R;
 import com.campos.david.appointments.activityNewAppointment.NewAppointmentActivity;
 import com.campos.david.appointments.activitySettings.SettingsFragment;
@@ -92,6 +93,10 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_about:
                 Intent throwAboutIntent = new Intent(getApplicationContext(), AboutActivity.class);
                 startActivity(throwAboutIntent);
+                return true;
+            case R.id.action_change_ip:
+                ApiUrlDialog dialog = new ApiUrlDialog();
+                dialog.show(getFragmentManager(), "NoticeDialogFragment");
                 return true;
             case R.id.action_bd_dummy_data: {
                 Log.d(TAG, "Generating dummy data");

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/appointment_name_hint"
+        android:maxLength="50"
+        android:maxLines="1"
+        android:inputType="text"
+        android:id="@+id/et_appointment_name" />
+
+    <EditText
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_gravity="top"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:minHeight="24dp"
+        android:layout_weight="1"
+        android:inputType="textMultiLine"
+        android:ems="10"
+        android:id="@+id/et_appointment_description"
+        android:hint="@string/appointment_description_hint" />
+
+
+    <LinearLayout
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:id="@+id/iv_selected_type_icon"
+            android:contentDescription="@string/selected_type_icon_description"
+            android:src="@drawable/logo" />
+
+        <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/sp_type_of_appointments"
+            android:layout_gravity="center_vertical" />
+    </LinearLayout>
+
+    <Switch
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/open_switch_text"
+        android:checked="true"
+        android:id="@+id/sw_open_discussion" />
+
+    <LinearLayout
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/tv_selected_timestamp" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_change_text"
+            android:id="@+id/btn_change_timestamp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_place_name"
+            android:text="@string/text_not_selected" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_change_place"
+            android:text="@string/btn_change_text" />
+    </LinearLayout>
+
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/mv_locationMap"
+        android:layout_width="359dp"
+        android:layout_height="212dp"
+        map:cameraZoom="13"
+        map:liteMode="true"
+        map:mapType="normal" />
+
+</LinearLayout>

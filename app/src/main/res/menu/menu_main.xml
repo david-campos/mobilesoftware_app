@@ -12,6 +12,10 @@
         android:title="@string/text_about"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_change_ip"
+        android:title="Change api IP"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_bd_dummy_data"
         android:title="Generate dummy data"
         app:showAsAction="never"/>

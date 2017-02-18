@@ -20,14 +20,14 @@ import android.view.ViewGroup;
 import com.campos.david.appointments.R;
 import com.campos.david.appointments.model.DBContract;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * A fragment representing a list of Users to pick some of them.
  */
-public class PickUserFragment extends Fragment implements PickUsersAdapter.PickedUserListener,
+public class PickUsersFragment extends Fragment implements PickUsersAdapter.PickedUserListener,
         LoaderManager.LoaderCallbacks<Cursor> {
-    private static final String TAG = PickUserFragment.class.getSimpleName();
+    private static final String TAG = PickUsersFragment.class.getSimpleName();
 
     private Callbacks mActivity = null;
     private PickUsersAdapter mAdapter = null;
@@ -37,7 +37,7 @@ public class PickUserFragment extends Fragment implements PickUsersAdapter.Picke
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public PickUserFragment() {
+    public PickUsersFragment() {
     }
 
     @Override
@@ -105,12 +105,12 @@ public class PickUserFragment extends Fragment implements PickUsersAdapter.Picke
     }
 
     public interface Callbacks {
-        void showDone();
+        void showNext();
 
-        void hideDone();
+        void hideNext();
     }
 
-    public List<Integer> getSelectedUsers() {
+    public Collection<String> getSelectedUsers() {
         if (mAdapter != null)
             return mAdapter.getSelectedUsers();
         return null;
@@ -142,9 +142,9 @@ public class PickUserFragment extends Fragment implements PickUsersAdapter.Picke
         } else {
             if (mActivity != null) {
                 if (mAdapter.getSelectedCount() > 0) {
-                    mActivity.showDone();
+                    mActivity.showNext();
                 } else {
-                    mActivity.hideDone();
+                    mActivity.hideNext();
                 }
             }
         }

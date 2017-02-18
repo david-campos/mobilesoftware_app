@@ -14,9 +14,8 @@ import com.campos.david.appointments.CursorRecyclerViewAdapter;
 import com.campos.david.appointments.R;
 import com.campos.david.appointments.model.DBContract;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -98,11 +97,14 @@ public class AppointmentListRecyclerViewAdapter extends CursorRecyclerViewAdapte
         holder.mTitleView.setText(cursor.getString(AppointmentListFragment.CURSOR_NAME_COL));
 
         String place = cursor.getString(AppointmentListFragment.CURSOR_PLACE_COL);
-        String date = SimpleDateFormat.getDateTimeInstance(
-                SimpleDateFormat.LONG, SimpleDateFormat.SHORT).format(
-                new Date(cursor.getLong(AppointmentListFragment.CURSOR_TIMESTAMP_COL)));
+        Calendar calendar = Calendar.getInstance();
+        // Multiply database value by 1000 bc Date constructor expects milliseconds
+        calendar.setTimeInMillis(1000 * cursor.getLong(AppointmentListFragment.CURSOR_TIMESTAMP_COL));
+        String date = mContext.getString(R.string.timestamp_format,
+                calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
+                calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
         holder.mProposalInfoView.setText(
-                mContext.getResources().getString(R.string.format_place_and_data, place, date));
+                mContext.getString(R.string.format_place_and_data, place, date));
 
         if (mWithsValid) {
             List<String> users = mAppointmentWiths.get(cursor.getInt(AppointmentListFragment.CURSOR_ID_COL));

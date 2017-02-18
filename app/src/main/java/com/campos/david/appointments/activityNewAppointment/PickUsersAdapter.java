@@ -1,7 +1,6 @@
 package com.campos.david.appointments.activityNewAppointment;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
@@ -17,8 +16,8 @@ import com.campos.david.appointments.CursorRecyclerViewAdapter;
 import com.campos.david.appointments.R;
 import com.campos.david.appointments.model.DBContract;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
 
 public class PickUsersAdapter extends CursorRecyclerViewAdapter<PickUsersAdapter.ViewHolder> {
     public interface PickedUserListener {
@@ -43,26 +42,21 @@ public class PickUsersAdapter extends CursorRecyclerViewAdapter<PickUsersAdapter
         String ORDER_BY = DBContract.UsersEntry.COLUMN_BLOCKED + " ASC, " + DBContract.UsersEntry.COLUMN_NAME + " ASC";
     }
 
-    private static ColorStateList selectedTint = new ColorStateList(
-            new int[][]{
-                    new int[]{android.R.attr.state_enabled}},
-            new int[]{
-                    Color.GRAY});
-
     private Context mContext = null;
     private PickedUserListener mListener = null;
-    private List<Integer> mSelected = null;
+    private HashSet<String> mSelected = null;
 
-    public List<Integer> getSelectedUsers() {
+    public Collection<String> getSelectedUsers() {
         return mSelected;
     }
 
-    public void selectUser(int id) {
-        mSelected.add(id);
+    public void selectUser(String phone) {
+        if (!mSelected.contains(phone))
+            mSelected.add(phone);
     }
 
-    public void deselectUser(int id) {
-        mSelected.remove(id);
+    public void deselectUser(String phone) {
+        mSelected.remove(phone);
     }
 
     public int getSelectedCount() {
@@ -73,7 +67,7 @@ public class PickUsersAdapter extends CursorRecyclerViewAdapter<PickUsersAdapter
         super(context, null);
         mContext = context;
         mListener = listener;
-        mSelected = new ArrayList<>();
+        mSelected = new HashSet<>();
     }
 
     @Override
@@ -89,9 +83,10 @@ public class PickUsersAdapter extends CursorRecyclerViewAdapter<PickUsersAdapter
         final String name = cursor.getString(Query.COL_NAME);
         final String phone = cursor.getString(Query.COL_PHONE);
         final boolean blocked = (cursor.getInt(Query.COL_BLOCKED) != 0);
-        final boolean selected = mSelected.contains(cursor.getPosition());
+        final boolean selected = mSelected.contains(phone);
 
         viewHolder.setUserId(id);
+        viewHolder.setPhone(phone);
         viewHolder.setBlocked(blocked);
 
         viewHolder.mNameView.setText(name);
@@ -109,18 +104,18 @@ public class PickUsersAdapter extends CursorRecyclerViewAdapter<PickUsersAdapter
         viewHolder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                userClicked(blocked, selected, viewHolder);
+                userClicked(blocked, viewHolder);
                 mListener.onUserPicked(viewHolder);
             }
         });
     }
 
-    public void userClicked(final boolean blocked, final boolean selected, final ViewHolder viewHolder) {
+    public void userClicked(final boolean blocked, final ViewHolder viewHolder) {
         if (!blocked) {
-            if (selected) {
-                deselectUser(mSelected.indexOf(viewHolder.getAdapterPosition()));
+            if (mSelected.contains(viewHolder.getPhone())) {
+                deselectUser(viewHolder.getPhone());
             } else {
-                selectUser(viewHolder.getAdapterPosition());
+                selectUser(viewHolder.getPhone());
             }
             notifyDataSetChanged();
         }
@@ -134,6 +129,7 @@ public class PickUsersAdapter extends CursorRecyclerViewAdapter<PickUsersAdapter
 
         private int mUserId = 0;
         private boolean mBlocked = false;
+        private String mPhone = null;
 
         public ViewHolder(View view) {
             super(view);
@@ -141,6 +137,14 @@ public class PickUsersAdapter extends CursorRecyclerViewAdapter<PickUsersAdapter
             mNameView = (TextView) view.findViewById(R.id.tv_userName);
             mPhoneView = (TextView) view.findViewById(R.id.tv_userPhone);
             mProfilePictureView = (ImageView) view.findViewById(R.id.iv_userPicture);
+        }
+
+        public String getPhone() {
+            return mPhone;
+        }
+
+        public void setPhone(String phone) {
+            this.mPhone = phone;
         }
 
         public int getUserId() {

@@ -30,7 +30,7 @@ import com.campos.david.appointments.services.UpdateTypesAndReasonsService;
 import com.campos.david.appointments.services.UpdateUsersService;
 
 import static android.Manifest.permission.READ_CONTACTS;
-
+// TODO: cancel AsyncTask on UI destroyed
 /**
  * LoginActivity activity of the app
  */

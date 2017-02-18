@@ -67,7 +67,6 @@
     <string name="text_appointments">appointments</string>
     <string name="text_suggestions">suggestions</string>
     <string name="api_uri_key">api_uri_key</string>
-    <string name="api_uri_default">127.0.0.1</string>
     <string name="session_id_key">session_id</string>
     <string name="login_failed_text">Some problem during login.</string>
     <string name="api_url">Api url…</string>
@@ -83,12 +82,32 @@
     <string name="action_sign_in_short">Sign in</string>
     <string name="clock_icon_description">Clock icon representing the time of the appointment</string>
     <string name="action_done">Done</string>
+    <string name="appointment_timestamp">Timestamp: %1$s</string>
+    <string name="timestamp_format">%1$04d/%2$02d/%3$02d, %4$02d:%5$02d</string>
 
     <plurals name="withs_and_x_more">
         <item quantity="one">" and %d more"</item>
         <item quantity="other">" and %d more"</item>
     </plurals>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="appointment_name_hint">Appointment name</string>
+    <string name="appointment_description_hint">Appointment description</string>
+    <string name="open_switch_text">Open discussion for date and hour</string>
+    <string name="btn_change_text">Change</string>
+    <string name="text_not_selected">Not selected</string>
+    <string name="selected_type_icon_description">Icon of the selected type</string>
+    <string name="text_next">Next</string>
+    <string name="edit_text_place_hint">Place</string>
+    <string name="check_location_settings_fail_text">Couldn\'t get location (user denied the access).</string>
+    <string name="service_not_available">Service not available</string>
+    <string name="invalid_latlong">Invalid LatLong used</string>
+    <string name="no_address_found">No address found</string>
+    <string name="address_found">Address found</string>
+    <string name="google_attributions">Powered by Google</string>
+    <string name="unknown_place">Unknown place</string>
+    <string name="place_pattern">%1$s (%2$s)</string>
+    <string name="text_location_not_selected">You have to select a location</string>
+    <string name="description_not_valid_text">Enter a valid description</string>
+    <string name="name_not_valid_text">Please, enter a valid name</string>
 </resources>

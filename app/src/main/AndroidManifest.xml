@@ -9,6 +9,7 @@
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="22" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <uses-feature
         android:glEsVersion="0x00020000"
@@ -22,7 +23,7 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyA67nSOQn_baKeaaQQoruhtDbXS8_kL5ac" />
+            android:value="AIzaSyDrghVWX-3y6kVQI4A4mEyhigHoDBJVvOA" />
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -56,6 +57,7 @@
                 android:value=".activityMain.MainActivity" />
         </activity>
         <activity android:name=".AboutActivity" />
+        <activity android:name=".activityNewAppointment.NewAppointmentActivity" />
 
         <service
             android:name=".services.UpdateUsersService"
@@ -65,8 +67,9 @@
             android:name=".services.UpdateTypesAndReasonsService"
             android:enabled="true"
             android:exported="false" />
-
-        <activity android:name=".activityNewAppointment.NewAppointmentActivity"></activity>
+        <service
+            android:name=".services.CreateAppointmentService"
+            android:exported="false"></service>
     </application>
 
 </manifest>

@@ -35,6 +35,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 /**
  * Main fragment for the AppointmentActivity when the appointment has not been created by the user
@@ -371,10 +372,14 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Loader
 
             mAddressView.setText(place);
             mDescriptionView.setText(description);
-            mTimestampView.setText(
-                    SimpleDateFormat.getDateTimeInstance(
-                            java.text.SimpleDateFormat.LONG, java.text.SimpleDateFormat.MEDIUM)
-                            .format(timestampLong));
+
+            Calendar calendar = Calendar.getInstance();
+            // Multiply database value by 1000 bc Date constructor expects milliseconds
+            calendar.setTimeInMillis(1000 * timestampLong);
+            String date = getString(R.string.timestamp_format,
+                    calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
+                    calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
+            mTimestampView.setText(date);
 
             mSuggestChange.setEnabled(!mClosed);
             mCloseDiscussion.setEnabled(true);

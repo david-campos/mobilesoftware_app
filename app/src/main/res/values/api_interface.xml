@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?><!-- Interface with the API. NOTHING TO TRANSLATE HERE!! -->
 <resources>
+    <string name="api_protocol">http://</string>
+    <string name="api_uri_default">127.0.0.1</string>
+    <string name="api_timestamp_format">%1$04d-%2$02d-%3$02d %4$02d:%5$02d:00</string>
+    <integer name="appointment_name_max_length">50</integer>
+    <integer name="user_phone_max_length">22</integer>
+    <integer name="user_name_max_length">30</integer>
+
     <string name="query_session_phone_key">phn</string>
     <string name="query_session_key_key">key</string>
     <string name="query_request_key">req</string>
@@ -25,10 +32,22 @@
     <string name="response_reason_name">name</string>
     <string name="response_reason_description">description</string>
 
+    <string name="req_new_appointment">nappo</string>
+    <string name="query_appointment_name">n</string>
+    <string name="query_appointment_description">d</string>
+    <string name="query_appointment_timestamp">h</string>
+    <string name="query_appointment_place">p</string>
+    <string name="query_appointment_closed">c</string>
+    <string name="query_appointment_type">t</string>
+    <string name="query_appointment_latitude">la</string>
+    <string name="query_appointment_longitude">lo</string>
+    <string name="query_appointment_invited_users">u</string>
+
     <integer name="response_error_code">500</integer>
 
     <string name="response_result_key">result</string>
     <string name="response_error_key">error</string>
     <string name="response_error_code_key">code</string>
-    <string name="api_protocol">http://</string>
+    <string name="response_status_key">status</string>
+    <string name="response_status_error">error</string>
 </resources>

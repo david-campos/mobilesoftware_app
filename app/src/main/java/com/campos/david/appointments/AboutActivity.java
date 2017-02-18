@@ -154,15 +154,18 @@ public class AboutActivity extends AppCompatActivity {
                 }
                 sizeProportion = (mWidth * 1.1f) / widest;
                 for (int i = 0; i < licenseInfo.length; i++) {
-                    mTexts[i + 3] = new Text(0, (int) Math.round(95 + 2.1 * sizeProportion * i), licenseInfo[i], 2 * sizeProportion);
+                    mTexts[i + 4] = new Text(0, Math.round(14 * sizeProportion * i), licenseInfo[i], 2 * sizeProportion);
                 }
             } else {
-                mTexts = new Text[3]; // Change also in if clause
+                mTexts = new Text[4]; // Change also in if clause
             }
             mTexts[0] = new Text(0, 0, mContext.getString(R.string.app_name), 4 * sizeProportion);
-            mTexts[1] = new Text(0, 35, mContext.getString(R.string.text_author, mContext.getString(R.string.author)), 3 * sizeProportion);
-            mTexts[2] = new Text(0, 65, mContext.getString(R.string.author_mail), 3 * sizeProportion);
-
+            mTexts[1] = new Text(0, Math.round(4 * sizeProportion),
+                    mContext.getString(R.string.text_author, mContext.getString(R.string.author)), 3 * sizeProportion);
+            mTexts[2] = new Text(0, Math.round(7 * sizeProportion),
+                    mContext.getString(R.string.author_mail), 3 * sizeProportion);
+            mTexts[3] = new Text(0, Math.round(10 * sizeProportion),
+                    mContext.getString(R.string.google_attributions), 3 * sizeProportion);
         }
 
         @Override

@@ -146,7 +146,7 @@ public class AboutActivity extends AppCompatActivity {
             if (licenseInfoStr != null) {
                 licenseInfo = licenseInfoStr.split("\n");
 
-                mTexts = new Text[licenseInfo.length + 3]; // Change also in else clause
+                mTexts = new Text[licenseInfo.length + 4]; // Change also in else clause
                 int widest = 0;
                 for (String aLicenseInfo : licenseInfo) {
                     if (aLicenseInfo.length() > widest)
@@ -154,7 +154,7 @@ public class AboutActivity extends AppCompatActivity {
                 }
                 sizeProportion = (mWidth * 1.1f) / widest;
                 for (int i = 0; i < licenseInfo.length; i++) {
-                    mTexts[i + 4] = new Text(0, Math.round(14 * sizeProportion * i), licenseInfo[i], 2 * sizeProportion);
+                    mTexts[i + 4] = new Text(0, Math.round((14 + 2 * i) * sizeProportion), licenseInfo[i], 2 * sizeProportion);
                 }
             } else {
                 mTexts = new Text[4]; // Change also in if clause

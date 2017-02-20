@@ -430,7 +430,7 @@ public class ContentProvider extends android.content.ContentProvider {
         String[] tableAndUri = insertGetTableAndUri(uri);
         Long id;
         try {
-            id = db.insertOrThrow(tableAndUri[0], null, values);
+            id = db.insertWithOnConflict(tableAndUri[0], null, values, SQLiteDatabase.CONFLICT_REPLACE);
         } catch (SQLException e) {
             Log.e(TAG, "Error inserting " + values, e);
             return null;

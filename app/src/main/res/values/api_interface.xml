@@ -50,4 +50,26 @@
     <string name="response_error_code_key">code</string>
     <string name="response_status_key">status</string>
     <string name="response_status_error">error</string>
+    <string name="response_appointment_name">name</string>
+    <string name="response_appointment_description">description</string>
+    <string name="response_appointment_closed">closed</string>
+    <string name="response_appointment_type">typeName</string>
+    <string name="response_proposition_time">time</string>
+    <string name="response_proposition_coordinates">coordinates</string>
+    <string name="response_proposition_latitude">lat</string>
+    <string name="response_proposition_longitude">lon</string>
+    <string name="response_proposition_place">placeName</string>
+    <string name="response_proposition_appointment">appointment</string>
+    <string name="response_proposition_reason_name">reasonName</string>
+    <string name="response_proposition_reason_description">reasonDescription</string>
+    <string name="response_proposition_proposer">proposer</string>
+    <string name="response_appointment_invitations">invitations</string>
+    <string name="req_get_appointments">gappo</string>
+    <string name="response_appointment_creator">creator</string>
+    <string name="response_invitation_user">user</string>
+    <string name="response_invitation_state">state</string>
+    <string name="response_invitation_reason_name">reasonName</string>
+    <string name="response_invitation_reason_description">reasonDescription</string>
+    <string name="response_appointment_current_proposition">currentProposition</string>
+    <string name="req_who_am_i">wai</string>
 </resources>

@@ -20,6 +20,7 @@ import com.campos.david.appointments.R;
 import com.campos.david.appointments.activityNewAppointment.NewAppointmentActivity;
 import com.campos.david.appointments.activitySettings.SettingsFragment;
 import com.campos.david.appointments.model.DBContract;
+import com.campos.david.appointments.services.UpdateAppointmentsService;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,6 +39,10 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
         FloatingActionButton fabNewAppointment =
                 (FloatingActionButton) findViewById(R.id.fab_newAppointment);
+
+        // Update appointments
+        Intent throwingService = new Intent(getApplicationContext(), UpdateAppointmentsService.class);
+        startService(throwingService);
 
         if (viewPager != null && tabLayout != null) {
             // Set PagerAdapter so that it can display items

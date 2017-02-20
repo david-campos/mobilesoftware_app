@@ -10,7 +10,6 @@ import android.util.Log;
 
 import com.campos.david.appointments.R;
 import com.campos.david.appointments.model.DBContract;
-import com.campos.david.appointments.model.DBContract.UsersEntry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -70,6 +69,20 @@ public class ApiConnector {
         return null;
     }
 
+    public int whoAmI() {
+        ContentValues cv = new ContentValues();
+        cv.put(mContext.getString(R.string.query_request_key), mContext.getString(R.string.req_who_am_i));
+        JSONObject me = getObjectFromApi(cv);
+        if (me.has(mContext.getString(R.string.response_id))) {
+            try {
+                return me.getInt(mContext.getString(R.string.response_id));
+            } catch (JSONException e) {
+                Log.e(TAG, "Error getting who am I", e);
+            }
+        }
+        return -1;
+    }
+
     /**
      * Tries to filter the list of phones to find that ones that are registered in the
      * API database.
@@ -93,8 +106,9 @@ public class ApiConnector {
         if (result != null) {
             try {
                 ContentValues[] list = new ContentValues[result.length()];
+                Parser parser = new Parser(mContext);
                 for (int i = 0; i < result.length(); i++) {
-                    list[i] = userJsonToContentValues(result.getJSONObject(i));
+                    list[i] = parser.getUserFrom(result.getJSONObject(i));
                 }
                 return list;
             } catch (JSONException e) {
@@ -102,27 +116,6 @@ public class ApiConnector {
             }
         }
         return null;
-    }
-
-    public ContentValues userJsonToContentValues(@NonNull JSONObject user) throws JSONException {
-        ContentValues userCv = new ContentValues(5);
-
-        // Get the keys as defined in api_interface.xml
-        String idKey = mContext.getString(R.string.response_id);
-        String nameKey = mContext.getString(R.string.response_user_name);
-        String phoneKey = mContext.getString(R.string.response_user_phone);
-        String pictureKey = mContext.getString(R.string.response_user_picture);
-        String blockedKey = mContext.getString(R.string.response_user_blocked);
-
-        // Add all that we can find in the JSON
-        if (user.has(idKey)) userCv.put(UsersEntry._ID, user.getInt(idKey));
-        if (user.has(nameKey)) userCv.put(UsersEntry.COLUMN_NAME, user.getString(nameKey));
-        if (user.has(phoneKey)) userCv.put(UsersEntry.COLUMN_PHONE, user.getString(phoneKey));
-        if (user.has(pictureKey)) userCv.put(UsersEntry.COLUMN_PICTURE, user.getInt(pictureKey));
-        if (user.has(blockedKey))
-            userCv.put(UsersEntry.COLUMN_BLOCKED, user.getBoolean(blockedKey));
-
-        return userCv;
     }
 
     /**
@@ -167,6 +160,21 @@ public class ApiConnector {
         return getObjectFromApi(cv);
     }
 
+    public JSONObject[] getAppointments() {
+        ContentValues cv = new ContentValues();
+        cv.put(mContext.getString(R.string.query_request_key), mContext.getString(R.string.req_get_appointments));
+        JSONArray appointmentsJsonArray = getArrayFromApi(cv);
+        JSONObject[] appointments = new JSONObject[appointmentsJsonArray.length()];
+        for (int i = 0; i < appointmentsJsonArray.length(); i++) {
+            try {
+                appointments[i] = appointmentsJsonArray.getJSONObject(i);
+            } catch (JSONException e) {
+                // Do nothing
+            }
+        }
+        return appointments;
+    }
+
     public Pair<ContentValues[], ContentValues[]> getAppointmentTypesAndReasons() {
         ContentValues cv = new ContentValues(1);
         cv.put(mContext.getString(R.string.query_request_key),
@@ -208,6 +216,7 @@ public class ApiConnector {
         }
         return null;
     }
+
 
     private JSONObject getObjectFromApi(ContentValues params) {
         return getFromApi(params, JSONObject.class);

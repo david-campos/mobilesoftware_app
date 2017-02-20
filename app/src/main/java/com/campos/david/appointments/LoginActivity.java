@@ -63,9 +63,10 @@ public class LoginActivity extends AppCompatActivity {
 
         mSession = getSharedPreferences(getString(R.string.session_file_key), Context.MODE_PRIVATE);
         String session_key = mSession.getString(getString(R.string.session_key_key), null);
+        int session_user_id = mSession.getInt(getString(R.string.session_user_id_key), -1);
         Boolean firstUpdateDone = mSession.getBoolean(getString(R.string.session_users_update_done_key), false);
         Boolean typesAndReasonsDone = mSession.getBoolean(getString(R.string.session_types_reasons_done_key), false);
-        if (session_key != null && firstUpdateDone && typesAndReasonsDone) {
+        if (session_key != null && session_user_id != -1 && firstUpdateDone && typesAndReasonsDone) {
             throwMainActivity();
             return;
         }
@@ -235,13 +236,14 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(String... params) {
+            ApiConnector connector = new ApiConnector(mContext);
+
             String session_key = mSession.getString(getString(R.string.session_key_key), null);
             if (session_key == null) {
                 publishProgress(getString(R.string.text_creating_session));
                 if (params.length < 0) {
                     return false;
                 }
-                ApiConnector connector = new ApiConnector(mContext);
                 Pair<Integer, String> result = connector.login(params[0]);
                 if (result == null) {
                     return false;
@@ -251,6 +253,18 @@ public class LoginActivity extends AppCompatActivity {
                 editor.putString(mContext.getString(R.string.session_key_key), result.second);
                 editor.putString(mContext.getString(R.string.session_phone_key), params[0]);
                 editor.commit();
+            }
+
+            int session_user_id = mSession.getInt(getString(R.string.session_user_id_key), -1);
+            if (session_user_id == -1) {
+                publishProgress(getString(R.string.text_getting_account_information));
+                int userId = connector.whoAmI();
+                if (userId != -1) {
+                    mSession.edit().putInt(getString(R.string.session_user_id_key), userId)
+                            .commit();
+                } else {
+                    return false;
+                }
             }
 
             Boolean typesAndReasonsDone = mSession.getBoolean(getString(R.string.session_types_reasons_done_key), false);

@@ -3,9 +3,13 @@
     <string name="author">David Campos Rodríguez</string>
     <string name="text_author">Author: %1$s</string>
 
+    <string name="api_uri_key" translatable="false">api_uri_key</string>
     <string name="session_file_key" translatable="false">session_file</string>
     <string name="session_phone_key" translatable="false">session_phone</string>
     <string name="session_key_key" translatable="false">session_key</string>
+    <string name="session_id_key" translatable="false">session_id</string>
+    <string name="session_user_id_key" translatable="false">session_user_id</string>
+
     <string name="preferences_file_key" translatable="false">preferences_file</string>
     <string name="session_users_update_done_key" translatable="false">users_update_done_key</string>
 
@@ -66,8 +70,6 @@
     <string name="text_nothing_to_show_yet">No %1$s to show yet</string>
     <string name="text_appointments">appointments</string>
     <string name="text_suggestions">suggestions</string>
-    <string name="api_uri_key">api_uri_key</string>
-    <string name="session_id_key">session_id</string>
     <string name="login_failed_text">Some problem during login.</string>
     <string name="api_url">Api url…</string>
     <string name="changing_api_url">Changing API url…</string>
@@ -110,4 +112,5 @@
     <string name="text_location_not_selected">You have to select a location</string>
     <string name="description_not_valid_text">Enter a valid description</string>
     <string name="name_not_valid_text">Please, enter a valid name</string>
+    <string name="text_getting_account_information">Getting account information…</string>
 </resources>

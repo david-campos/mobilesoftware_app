@@ -6,9 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.provider.ContactsContract;
-import android.util.Log;
 
-import com.campos.david.appointments.model.DBContract;
+import com.campos.david.appointments.model.UserManager;
 
 import java.util.ArrayList;
 
@@ -39,8 +38,7 @@ public class UpdateUsersService extends IntentService {
             c.close();
             ContentValues[] users = (new ApiConnector(ctx)).filterUsers(phones);
             if (users != null) {
-                int inserted = ctx.getContentResolver().bulkInsert(DBContract.UsersEntry.CONTENT_URI, users);
-                Log.d(ctx.getClass().getSimpleName(), "Inserted " + inserted + " users.");
+                (new UserManager(ctx)).insertUsers(users);
             } else {
                 throw new NullPointerException("Filtered users is null (not empty).");
             }

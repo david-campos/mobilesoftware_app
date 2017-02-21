@@ -18,7 +18,7 @@ import com.campos.david.appointments.AboutActivity;
 import com.campos.david.appointments.ApiUrlDialog;
 import com.campos.david.appointments.R;
 import com.campos.david.appointments.activityNewAppointment.NewAppointmentActivity;
-import com.campos.david.appointments.activitySettings.SettingsFragment;
+import com.campos.david.appointments.activitySettings.SettingsActivity;
 import com.campos.david.appointments.model.DBContract;
 import com.campos.david.appointments.services.UpdateAppointmentsService;
 
@@ -90,10 +90,9 @@ public class MainActivity extends AppCompatActivity {
 
         switch (id) {
             case R.id.action_settings:
-                // Display the settings as the main content.
-                getFragmentManager().beginTransaction()
-                        .replace(android.R.id.content, new SettingsFragment())
-                        .commit();
+                // Display settings
+                Intent throwSettingsIntent = new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(throwSettingsIntent);
                 return true;
             case R.id.action_about:
                 Intent throwAboutIntent = new Intent(getApplicationContext(), AboutActivity.class);

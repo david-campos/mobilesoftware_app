@@ -5,7 +5,9 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -21,6 +23,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -49,6 +52,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.squareup.picasso.Picasso;
 
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -133,21 +137,32 @@ public class AppointmentDefinitionFragment extends Fragment
     }
 
     private void initAppointmentTypesAdapter() {
+        SharedPreferences preferences = getContext().getSharedPreferences(
+                getContext().getString(R.string.preferences_file_key), Context.MODE_PRIVATE);
+        final String apiUri = getContext().getString(R.string.api_protocol) +
+                preferences.getString(getContext().getString(R.string.api_uri_key),
+                        getContext().getString(R.string.api_uri_default));
+
         mAdapterTypes = new SimpleCursorAdapter(
                 getActivity(), android.R.layout.simple_spinner_item,
                 null, AppointmentTypesQuery.FROM_COLS, new int[]{android.R.id.text1}, 0);
         mAdapterTypes.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        mTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                Cursor cursor = (Cursor) parent.getAdapter().getItem(position);
-//                //TODO: Change image of mSelectedTypeIcon to the appropriated icon
-//            }
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//                // Do nothing
-//            }
-//        });
+        mTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Cursor cursor = (Cursor) parent.getAdapter().getItem(position);
+                int iconId = cursor.getInt(AppointmentTypesQuery.COL_ICON);
+                String uri = getString(R.string.api_types_format, apiUri, iconId);
+                Picasso.with(getContext())
+                        .load(uri)
+                        .into(mSelectedTypeIcon);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Do nothing
+            }
+        });
         mTypeSpinner.setAdapter(mAdapterTypes);
     }
 

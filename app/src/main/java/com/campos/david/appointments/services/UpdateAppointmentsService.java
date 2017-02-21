@@ -3,6 +3,7 @@ package com.campos.david.appointments.services;
 import android.app.IntentService;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.util.Log;
 
 import com.campos.david.appointments.model.AppointmentManager;
 
@@ -20,23 +21,27 @@ public class UpdateAppointmentsService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        ApiConnector connector = new ApiConnector(this);
-        Parser parser = new Parser(this);
-        AppointmentManager manager = new AppointmentManager(this);
+        try {
+            ApiConnector connector = new ApiConnector(this);
+            Parser parser = new Parser(this);
+            AppointmentManager manager = new AppointmentManager(this);
 
-        JSONObject[] appointments = connector.getAppointments();
-        ContentValues[] appCvs = new ContentValues[appointments.length];
-        ContentValues[] currentProposalCvs = new ContentValues[appointments.length];
-        ArrayList<ContentValues> invitationsCvs = new ArrayList<>();
-        for (int i = 0; i < appointments.length; i++) {
-            appCvs[i] = parser.getAppointmentFrom(appointments[i]);
-            invitationsCvs.addAll(Arrays.asList(parser.getInvitationsFrom(appointments[i])));
-            if (parser.hasCurrentProposal(appointments[i])) {
-                currentProposalCvs[i] = parser.getCurrentPropositionFrom(appointments[i]);
+            JSONObject[] appointments = connector.getAppointments();
+            ContentValues[] appCvs = new ContentValues[appointments.length];
+            ContentValues[] currentProposalCvs = new ContentValues[appointments.length];
+            ArrayList<ContentValues> invitationsCvs = new ArrayList<>();
+            for (int i = 0; i < appointments.length; i++) {
+                appCvs[i] = parser.getAppointmentFrom(appointments[i]);
+                invitationsCvs.addAll(Arrays.asList(parser.getInvitationsFrom(appointments[i])));
+                if (parser.hasCurrentProposal(appointments[i])) {
+                    currentProposalCvs[i] = parser.getCurrentPropositionFrom(appointments[i]);
+                }
             }
+            ContentValues[] invitationsCvsArray = new ContentValues[invitationsCvs.size()];
+            invitationsCvsArray = invitationsCvs.toArray(invitationsCvsArray);
+            manager.appointmentInsertion(appCvs, invitationsCvsArray, currentProposalCvs);
+        } catch (Exception e) {
+            Log.e(TAG, "Connection failed", e);
         }
-        ContentValues[] invitationsCvsArray = new ContentValues[invitationsCvs.size()];
-        invitationsCvsArray = invitationsCvs.toArray(invitationsCvsArray);
-        manager.appointmentInsertion(appCvs, invitationsCvsArray, currentProposalCvs);
     }
 }

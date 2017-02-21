@@ -143,13 +143,17 @@ public class ContentProvider extends android.content.ContentProvider {
                 break;
             case APPOINTMENTS_ACCEPTED: {
                 tableName = String.format(
-                        "(%s LEFT JOIN %s ON (%s.%s = %s.%s)) LEFT JOIN %s ON (%s.%s = %s.%s)",
+                        "((%s LEFT JOIN %s ON (%s.%s = %s.%s)) LEFT JOIN %s ON (%s.%s = %s.%s)) " +
+                                "LEFT JOIN %s ON (%s.%s = %s.%s)",
                         AppointmentsEntry.TABLE_NAME, InvitationsEntry.TABLE_NAME,
                         AppointmentsEntry.TABLE_NAME, AppointmentsEntry._ID,
                         InvitationsEntry.TABLE_NAME, InvitationsEntry.COLUMN_APPOINTMENT,
                         PropositionsEntry.TABLE_NAME,
                         AppointmentsEntry.TABLE_NAME, AppointmentsEntry.COLUMN_CURRENT_PROPOSAL,
-                        PropositionsEntry.TABLE_NAME, PropositionsEntry._ID);
+                        PropositionsEntry.TABLE_NAME, PropositionsEntry._ID,
+                        AppointmentTypesEntry.TABLE_NAME,
+                        AppointmentTypesEntry.TABLE_NAME, AppointmentTypesEntry._ID,
+                        AppointmentsEntry.TABLE_NAME, AppointmentsEntry.COLUMN_TYPE);
                 String mySelection = String.format("%s.%s IS NULL OR ( %s.%s IS NULL AND %s.%s = 'accepted' )",
                         AppointmentsEntry.TABLE_NAME, AppointmentsEntry.COLUMN_CREATOR,
                         InvitationsEntry.TABLE_NAME, InvitationsEntry.COLUMN_USER,
@@ -163,13 +167,17 @@ public class ContentProvider extends android.content.ContentProvider {
                 break; }
             case APPOINTMENTS_PENDING: {
                 tableName = String.format(
-                        "(%s JOIN %s ON (%s.%s = %s.%s)) LEFT JOIN %s ON (%s.%s = %s.%s)",
+                        "((%s JOIN %s ON (%s.%s = %s.%s)) LEFT JOIN %s ON (%s.%s = %s.%s)) " +
+                                "LEFT JOIN %s ON (%s.%s = %s.%s)",
                         AppointmentsEntry.TABLE_NAME, InvitationsEntry.TABLE_NAME,
                         AppointmentsEntry.TABLE_NAME, AppointmentsEntry._ID,
                         InvitationsEntry.TABLE_NAME, InvitationsEntry.COLUMN_APPOINTMENT,
                         PropositionsEntry.TABLE_NAME,
                         AppointmentsEntry.TABLE_NAME, AppointmentsEntry.COLUMN_CURRENT_PROPOSAL,
-                        PropositionsEntry.TABLE_NAME, PropositionsEntry._ID);
+                        PropositionsEntry.TABLE_NAME, PropositionsEntry._ID,
+                        AppointmentTypesEntry.TABLE_NAME,
+                        AppointmentTypesEntry.TABLE_NAME, AppointmentTypesEntry._ID,
+                        AppointmentsEntry.TABLE_NAME, AppointmentsEntry.COLUMN_TYPE);
                 String mySelection = String.format("%s.%s IS NULL AND %s.%s = 'pending'",
                         InvitationsEntry.TABLE_NAME, InvitationsEntry.COLUMN_USER,
                         InvitationsEntry.TABLE_NAME, InvitationsEntry.COLUMN_STATE);
@@ -182,13 +190,17 @@ public class ContentProvider extends android.content.ContentProvider {
                 break; }
             case APPOINTMENTS_REFUSED:{
                 tableName = String.format(
-                        "(%s JOIN %s ON (%s.%s = %s.%s)) LEFT JOIN %s ON (%s.%s = %s.%s)",
+                        "((%s JOIN %s ON (%s.%s = %s.%s)) LEFT JOIN %s ON (%s.%s = %s.%s)) " +
+                                "LEFT JOIN %s ON (%s.%s = %s.%s)",
                         AppointmentsEntry.TABLE_NAME, InvitationsEntry.TABLE_NAME,
                         AppointmentsEntry.TABLE_NAME, AppointmentsEntry._ID,
                         InvitationsEntry.TABLE_NAME, InvitationsEntry.COLUMN_APPOINTMENT,
                         PropositionsEntry.TABLE_NAME,
                         AppointmentsEntry.TABLE_NAME, AppointmentsEntry.COLUMN_CURRENT_PROPOSAL,
-                        PropositionsEntry.TABLE_NAME, PropositionsEntry._ID);
+                        PropositionsEntry.TABLE_NAME, PropositionsEntry._ID,
+                        AppointmentTypesEntry.TABLE_NAME,
+                        AppointmentTypesEntry.TABLE_NAME, AppointmentTypesEntry._ID,
+                        AppointmentsEntry.TABLE_NAME, AppointmentsEntry.COLUMN_TYPE);
                 String mySelection = String.format("%s.%s IS NULL AND %s.%s = 'refused'",
                         InvitationsEntry.TABLE_NAME, InvitationsEntry.COLUMN_USER,
                         InvitationsEntry.TABLE_NAME, InvitationsEntry.COLUMN_STATE);

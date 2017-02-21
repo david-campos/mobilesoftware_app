@@ -41,7 +41,8 @@ public class AppointmentListFragment extends Fragment implements LoaderManager.L
             DBContract.PropositionsEntry.TABLE_NAME + "." + DBContract.PropositionsEntry.COLUMN_TIMESTAMP,
             DBContract.PropositionsEntry.TABLE_NAME + "." + DBContract.PropositionsEntry.COLUMN_PLACE_NAME,
             DBContract.AppointmentsEntry.TABLE_NAME + "." + DBContract.AppointmentsEntry.COLUMN_CREATOR,
-            DBContract.AppointmentsEntry.TABLE_NAME + "." + DBContract.AppointmentsEntry.COLUMN_CLOSED
+            DBContract.AppointmentsEntry.TABLE_NAME + "." + DBContract.AppointmentsEntry.COLUMN_CLOSED,
+            DBContract.AppointmentTypesEntry.TABLE_NAME + "." + DBContract.AppointmentTypesEntry.COLUMN_ICON
     };
     public static final int CURSOR_ID_COL = 0;
     public static final int CURSOR_NAME_COL = 1;
@@ -49,6 +50,7 @@ public class AppointmentListFragment extends Fragment implements LoaderManager.L
     public static final int CURSOR_PLACE_COL = 3;
     public static final int CURSOR_CREATOR_COL = 4;
     public static final int CURSOR_CLOSED_COL = 5;
+    public static final int CURSOR_TYPE_ICON_COL = 6;
 
     private static final int LOADER_APPOINTMENTS = 0;
     private static final int LOADER_WITHS = 1;

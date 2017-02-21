@@ -1,7 +1,9 @@
 package com.campos.david.appointments.activityMain;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +15,7 @@ import android.widget.TextView;
 import com.campos.david.appointments.CursorRecyclerViewAdapter;
 import com.campos.david.appointments.R;
 import com.campos.david.appointments.model.DBContract;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,6 +37,7 @@ public class AppointmentListRecyclerViewAdapter extends CursorRecyclerViewAdapte
     private Map<Integer, List<String>> mAppointmentWiths = new HashMap<>();
     private Cursor mWithsCursor;
     private boolean mWithsValid;
+    private String mApiUri;
 
     public AppointmentListRecyclerViewAdapter(Context context,
                                               OnListFragmentInteractionListener listener) {
@@ -42,6 +46,10 @@ public class AppointmentListRecyclerViewAdapter extends CursorRecyclerViewAdapte
         mWithsCursor = null;
         mWithsValid = false;
         mListener = listener;
+        SharedPreferences preferences = mContext.getSharedPreferences(mContext.getString(R.string.preferences_file_key),
+                Context.MODE_PRIVATE);
+        mApiUri = mContext.getString(R.string.api_protocol) + preferences.getString(mContext.getString(R.string.api_uri_key),
+                mContext.getString(R.string.api_uri_default));
     }
 
     public Cursor swapWithsCursor(Cursor c) {
@@ -128,7 +136,14 @@ public class AppointmentListRecyclerViewAdapter extends CursorRecyclerViewAdapte
             holder.mWithInfoView.setText(R.string.text_loading);
         }
 
-        holder.mImageView.setImageResource(R.drawable.ic_info_black_24dp);
+        int iconId = cursor.getInt(AppointmentListFragment.CURSOR_TYPE_ICON_COL);
+        String uri = Uri.parse(mApiUri).buildUpon()
+                .appendPath("type_pics").appendPath("type" + iconId + ".png").build().toString();
+        Picasso.with(mContext)
+                .load(uri)
+                .placeholder(R.drawable.logo)
+                .into(holder.mImageView);
+
         boolean isUserAppointment = cursor.isNull(AppointmentListFragment.CURSOR_CREATOR_COL);
         holder.mUserAppointment.setVisibility(isUserAppointment ? View.VISIBLE : View.INVISIBLE);
         holder.mView.setOnClickListener(new View.OnClickListener() {

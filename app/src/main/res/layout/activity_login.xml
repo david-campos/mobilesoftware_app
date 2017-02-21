@@ -69,7 +69,7 @@
         android:layout_alignRight="@+id/ivLogo"
         android:layout_alignEnd="@+id/ivLogo"
 
-        android:digits="+0123456789"
+        android:digits="0123456789"
         android:imeActionId="@+id/login"
         android:imeActionLabel="@string/action_sign_in_short"
         android:imeOptions="actionUnspecified" />

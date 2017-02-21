@@ -16,7 +16,7 @@ public class CountryCodesAdapter extends BaseAdapter {
 
     public CountryCodesAdapter(Activity ctx) {
         mContext = ctx;
-        this.mDelegated = new CountryCodes();
+        this.mDelegated = new CountryCodes(true);
     }
 
     @Override

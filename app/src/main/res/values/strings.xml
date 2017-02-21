@@ -10,6 +10,8 @@
     <string name="session_id_key" translatable="false">session_id</string>
     <string name="session_user_id_key" translatable="false">session_user_id</string>
 
+    <string name="common_IDD_for_international_calls">00</string>
+
     <string name="preferences_file_key" translatable="false">preferences_file</string>
     <string name="session_users_update_done_key" translatable="false">users_update_done_key</string>
 

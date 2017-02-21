@@ -141,7 +141,7 @@ public class AppointmentListRecyclerViewAdapter extends CursorRecyclerViewAdapte
                 .appendPath("type_pics").appendPath("type" + iconId + ".png").build().toString();
         Picasso.with(mContext)
                 .load(uri)
-                .placeholder(R.drawable.logo)
+                .placeholder(R.drawable.unknown_type)
                 .into(holder.mImageView);
 
         boolean isUserAppointment = cursor.isNull(AppointmentListFragment.CURSOR_CREATOR_COL);

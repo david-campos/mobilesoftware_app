@@ -155,6 +155,7 @@ public class AppointmentDefinitionFragment extends Fragment
                 String uri = getString(R.string.api_types_format, apiUri, iconId);
                 Picasso.with(getContext())
                         .load(uri)
+                        .placeholder(R.drawable.unknown_type)
                         .into(mSelectedTypeIcon);
             }
 

@@ -3,6 +3,7 @@
     <string name="api_protocol">http://</string>
     <string name="api_uri_default">127.0.0.1</string>
     <string name="api_types_format">%1$s/type_pics/type%2$d.png</string>
+    <string name="api_profile_pics_format">%1$s/profile_pics/p%2$d.png</string>
     <string name="api_timestamp_format">%1$04d-%2$02d-%3$02d %4$02d:%5$02d:00</string>
     <integer name="appointment_name_max_length">50</integer>
     <integer name="user_phone_max_length">22</integer>

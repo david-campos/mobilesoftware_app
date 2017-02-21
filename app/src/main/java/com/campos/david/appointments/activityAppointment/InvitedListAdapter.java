@@ -1,6 +1,7 @@
 package com.campos.david.appointments.activityAppointment;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import com.campos.david.appointments.CursorRecyclerViewAdapter;
 import com.campos.david.appointments.R;
 import com.campos.david.appointments.model.DBContract;
+import com.squareup.picasso.Picasso;
 
 /**
  * {@link RecyclerView.Adapter}
@@ -39,11 +41,17 @@ public class InvitedListAdapter extends CursorRecyclerViewAdapter<InvitedListAda
 
     private OnListFragmentInteractionListener mListener;
     private Context mContext;
+    private String mApiUri;
 
     public InvitedListAdapter(Context context, OnListFragmentInteractionListener listener) {
         super(context, null);
         mContext = context;
         mListener = listener;
+
+        SharedPreferences preferences = mContext.getSharedPreferences(mContext.getString(R.string.preferences_file_key),
+                Context.MODE_PRIVATE);
+        mApiUri = mContext.getString(R.string.api_protocol) + preferences.getString(mContext.getString(R.string.api_uri_key),
+                mContext.getString(R.string.api_uri_default));
     }
 
     @Override
@@ -83,8 +91,14 @@ public class InvitedListAdapter extends CursorRecyclerViewAdapter<InvitedListAda
 
         holder.mNameView.setText(cursor.getString(COL_NAME));
         holder.mNumberView.setText(cursor.getString(COL_PHONE));
-        //TODO: set the correct picture for the image view with picasso
-        holder.mPictureView.setImageDrawable(mContext.getResources().getDrawable(R.drawable.logo));
+
+        int iconId = cursor.getInt(COL_PICTURE);
+        String uri = mContext.getString(R.string.api_profile_pics_format, mApiUri, iconId);
+        Picasso.with(mContext)
+                .load(uri)
+                .placeholder(R.drawable.unknown_user)
+                .into(holder.mPictureView);
+
         boolean blocked = (cursor.getInt(COL_BLOCKED) != 0);
         if (blocked) {
             holder.mNameView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_lock_outline, 0, 0, 0);

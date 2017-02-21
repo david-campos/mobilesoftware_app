@@ -1,6 +1,7 @@
 package com.campos.david.appointments.activityNewAppointment;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import com.campos.david.appointments.CursorRecyclerViewAdapter;
 import com.campos.david.appointments.R;
 import com.campos.david.appointments.model.DBContract;
+import com.squareup.picasso.Picasso;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -45,6 +47,7 @@ public class PickUsersAdapter extends CursorRecyclerViewAdapter<PickUsersAdapter
     private Context mContext = null;
     private PickedUserListener mListener = null;
     private HashSet<String> mSelected = null;
+    private String mApiUri;
 
     public Collection<String> getSelectedUsers() {
         return mSelected;
@@ -68,6 +71,11 @@ public class PickUsersAdapter extends CursorRecyclerViewAdapter<PickUsersAdapter
         mContext = context;
         mListener = listener;
         mSelected = new HashSet<>();
+
+        SharedPreferences preferences = mContext.getSharedPreferences(mContext.getString(R.string.preferences_file_key),
+                Context.MODE_PRIVATE);
+        mApiUri = mContext.getString(R.string.api_protocol) + preferences.getString(mContext.getString(R.string.api_uri_key),
+                mContext.getString(R.string.api_uri_default));
     }
 
     @Override
@@ -84,6 +92,8 @@ public class PickUsersAdapter extends CursorRecyclerViewAdapter<PickUsersAdapter
         final String phone = cursor.getString(Query.COL_PHONE);
         final boolean blocked = (cursor.getInt(Query.COL_BLOCKED) != 0);
         final boolean selected = mSelected.contains(phone);
+        final int iconId = cursor.getInt(Query.COL_PICTURE);
+        String uri = mContext.getString(R.string.api_profile_pics_format, mApiUri, iconId);
 
         viewHolder.setUserId(id);
         viewHolder.setPhone(phone);
@@ -94,6 +104,10 @@ public class PickUsersAdapter extends CursorRecyclerViewAdapter<PickUsersAdapter
         viewHolder.mNameView.setCompoundDrawablesWithIntrinsicBounds(
                 blocked ? R.drawable.ic_lock_outline : 0, 0, 0, 0);
         viewHolder.mView.setAlpha(blocked ? 0.5f : 1.0f);
+        Picasso.with(mContext)
+                .load(uri)
+                .placeholder(R.drawable.unknown_user)
+                .into(viewHolder.mProfilePictureView);
 
         if (selected) {
             viewHolder.mView.setBackgroundColor(mContext.getResources().getColor(R.color.colorSelectedUser));

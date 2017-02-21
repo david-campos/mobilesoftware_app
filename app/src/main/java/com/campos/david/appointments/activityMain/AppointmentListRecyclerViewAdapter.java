@@ -3,7 +3,6 @@ package com.campos.david.appointments.activityMain;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -137,8 +136,7 @@ public class AppointmentListRecyclerViewAdapter extends CursorRecyclerViewAdapte
         }
 
         int iconId = cursor.getInt(AppointmentListFragment.CURSOR_TYPE_ICON_COL);
-        String uri = Uri.parse(mApiUri).buildUpon()
-                .appendPath("type_pics").appendPath("type" + iconId + ".png").build().toString();
+        String uri = mContext.getString(R.string.api_types_format, mApiUri, iconId);
         Picasso.with(mContext)
                 .load(uri)
                 .placeholder(R.drawable.unknown_type)

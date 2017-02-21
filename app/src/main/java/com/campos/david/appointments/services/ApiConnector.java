@@ -160,6 +160,21 @@ public class ApiConnector {
         return getObjectFromApi(cv);
     }
 
+    public JSONObject openAppointment(int appointmentId) {
+        ContentValues cv = new ContentValues();
+        cv.put(mContext.getString(R.string.query_appointment_id), appointmentId);
+        cv.put(mContext.getString(R.string.query_request_key), mContext.getString(R.string.req_open_appointment));
+        return getObjectFromApi(cv);
+    }
+
+    public JSONObject closeAppointment(int appointmentId) {
+        ContentValues cv = new ContentValues();
+        cv.put(mContext.getString(R.string.query_appointment_id), appointmentId);
+        cv.put(mContext.getString(R.string.query_request_key), mContext.getString(R.string.req_close_appointment));
+        return getObjectFromApi(cv);
+    }
+
+
     public JSONObject[] getAppointments() {
         ContentValues cv = new ContentValues();
         cv.put(mContext.getString(R.string.query_request_key), mContext.getString(R.string.req_get_appointments));

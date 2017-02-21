@@ -75,7 +75,11 @@
             android:name=".services.UpdateAppointmentsService"
             android:exported="false" />
 
-        <activity android:name=".activitySettings.SettingsActivity"></activity>
+        <activity android:name=".activitySettings.SettingsActivity" />
+
+        <service
+            android:name=".services.AppointmentDiscussionService"
+            android:exported="false"></service>
     </application>
 
 </manifest>

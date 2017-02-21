@@ -73,4 +73,7 @@
     <string name="response_invitation_reason_description">reasonDescription</string>
     <string name="response_appointment_current_proposition">currentProposition</string>
     <string name="req_who_am_i">wai</string>
+    <string name="req_open_appointment">oappo</string>
+    <string name="req_close_appointment">cappo</string>
+    <string name="query_appointment_id">aid</string>
 </resources>

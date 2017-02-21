@@ -2,6 +2,7 @@ package com.campos.david.appointments.activityAppointment;
 
 import android.annotation.TargetApi;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.PorterDuff;
@@ -22,6 +23,7 @@ import android.widget.TextView;
 
 import com.campos.david.appointments.R;
 import com.campos.david.appointments.model.DBContract;
+import com.campos.david.appointments.services.AppointmentDiscussionService;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -182,18 +184,15 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Loader
 
     public void toggleClosed() {
         if (mClosed != null) {
-            ContentValues cv = new ContentValues();
+            Intent throwService = new Intent(getActivity().getApplicationContext(),
+                    AppointmentDiscussionService.class);
             if (mClosed) {
-                cv.put(DBContract.AppointmentsEntry.COLUMN_CLOSED, 0);
+                throwService.setAction(AppointmentDiscussionService.ACTION_OPEN);
             } else {
-                cv.put(DBContract.AppointmentsEntry.COLUMN_CLOSED, 1);
+                throwService.setAction(AppointmentDiscussionService.ACTION_CLOSE);
             }
-            mClosed = null;
-            getActivity().getContentResolver().update(
-                    DBContract.AppointmentsEntry.CONTENT_URI.buildUpon()
-                            .appendPath(Integer.toString(mAppointmentId)).build(),
-                    cv, null, null);
-
+            throwService.putExtra(AppointmentDiscussionService.EXTRA_APPOINTMENT, mAppointmentId);
+            getActivity().startService(throwService);
         }
     }
 

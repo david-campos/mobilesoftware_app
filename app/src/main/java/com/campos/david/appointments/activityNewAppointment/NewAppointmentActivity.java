@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import com.campos.david.appointments.R;
 import com.campos.david.appointments.activityMain.MainActivity;
 import com.campos.david.appointments.services.CreateAppointmentService;
+import com.campos.david.appointments.services.UpdateTypesAndReasonsService;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
@@ -45,6 +46,10 @@ public class NewAppointmentActivity extends AppCompatActivity implements PickUse
                     .add(android.R.id.content, mCurrentFragment)
                     .commit();
         }
+
+        // Update types and reasons
+        Intent serviceIntent = new Intent(getApplicationContext(), UpdateTypesAndReasonsService.class);
+        startService(serviceIntent);
     }
 
     @Override

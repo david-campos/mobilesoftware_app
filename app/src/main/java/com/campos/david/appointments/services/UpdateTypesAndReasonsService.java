@@ -20,7 +20,11 @@ public class UpdateTypesAndReasonsService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        typesAndReasonsUpdate(this);
+        try {
+            typesAndReasonsUpdate(this);
+        } catch (Exception e) {
+            Log.e(TAG, "Types and reasons update failed", e);
+        }
     }
 
     public static void typesAndReasonsUpdate(Context ctx) {

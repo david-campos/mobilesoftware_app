@@ -14,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.TelephonyManager;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -22,6 +23,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.campos.david.appointments.activityMain.MainActivity;
@@ -46,6 +48,7 @@ public class LoginActivity extends AppCompatActivity {
     private ProgressBar mLoadBar;
     private Button mLoginButton;
     private SharedPreferences mSession;
+    private Spinner mCountryCode;
 
     private void throwMainActivity() {
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -78,15 +81,22 @@ public class LoginActivity extends AppCompatActivity {
         mLabel = (TextView) findViewById(R.id.tvTextPhoneNumber);
         mLoadBar = (ProgressBar) findViewById(R.id.pb_doing_login_bar);
         mInfoTV = (TextView) findViewById(R.id.tv_loginInfo);
+        mCountryCode = (Spinner) findViewById(R.id.spCountryCode);
 
         if (session_key != null) {
             new DoLoginTask(this).execute("");
         } else {
+            TelephonyManager manager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+            if (manager != null) {
+                mCountryCode.setAdapter(new CountryCodesAdapter(this));
+                mCountryCode.setSelection(CountryCodes.getIndex(manager.getSimCountryIso()));
+            }
+
             mEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                 @Override
                 public boolean onEditorAction(TextView v, int id, KeyEvent event) {
                     if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                        login(mEditText.getText().toString());
+                        loginClicked();
                         return true;
                     }
                     return false;
@@ -95,7 +105,7 @@ public class LoginActivity extends AppCompatActivity {
             mLoginButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    login(mEditText.getText().toString());
+                    loginClicked();
                 }
             });
             final GestureDetector gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
@@ -111,6 +121,10 @@ public class LoginActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void loginClicked() {
+        login("+" + CountryCodes.getCode((String) mCountryCode.getSelectedItem()) + mEditText.getText().toString());
     }
 
     private void login(String phone) {
@@ -161,58 +175,36 @@ public class LoginActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-            mLoginButton.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginButton.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginButton.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-            mLabel.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLabel.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLabel.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-            mEditText.setVisibility(show ? View.GONE : View.VISIBLE);
-            mEditText.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mEditText.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
+            animateElement(mLoginButton, shortAnimTime, !show);
+            animateElement(mLabel, shortAnimTime, !show);
+            animateElement(mEditText, shortAnimTime, !show);
+            animateElement(mCountryCode, shortAnimTime, !show);
 
-            mLoadBar.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoadBar.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoadBar.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-            mInfoTV.setVisibility(show ? View.VISIBLE : View.GONE);
-            mInfoTV.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mInfoTV.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-
+            animateElement(mLoadBar, shortAnimTime, show);
+            animateElement(mInfoTV, shortAnimTime, show);
         } else {
             // The ViewPropertyAnimator APIs are not available, so simply show
             // and hide the relevant UI components.
-            mLoginButton.setVisibility(show ? View.VISIBLE : View.GONE);
-            mEditText.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLabel.setVisibility(show ? View.VISIBLE : View.GONE);
+            mLoginButton.setVisibility(show ? View.GONE : View.VISIBLE);
+            mEditText.setVisibility(show ? View.GONE : View.VISIBLE);
+            mLabel.setVisibility(show ? View.GONE : View.VISIBLE);
+            mCountryCode.setVisibility(show ? View.GONE : View.VISIBLE);
 
-            mLoadBar.setVisibility(show ? View.GONE : View.VISIBLE);
-            mInfoTV.setVisibility(show ? View.GONE : View.VISIBLE);
+            mLoadBar.setVisibility(show ? View.VISIBLE : View.GONE);
+            mInfoTV.setVisibility(show ? View.VISIBLE : View.GONE);
         }
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void animateElement(final View view, int animationTime, final boolean show) {
+        view.setVisibility(show ? View.VISIBLE : View.GONE);
+        view.animate().setDuration(animationTime).alpha(
+                show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                view.setVisibility(show ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
     private class DoLoginTask extends AsyncTask<String, String, Boolean> {

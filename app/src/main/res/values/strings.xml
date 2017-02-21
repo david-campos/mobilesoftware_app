@@ -106,7 +106,7 @@
     <string name="invalid_latlong">Invalid LatLong used</string>
     <string name="no_address_found">No address found</string>
     <string name="address_found">Address found</string>
-    <string name="google_attributions">Powered by Google</string>
+    <string name="flags_attributions">Flag icons from www.icondrawer.com</string>
     <string name="unknown_place">Unknown place</string>
     <string name="place_pattern">%1$s (%2$s)</string>
     <string name="text_location_not_selected">You have to select a location</string>

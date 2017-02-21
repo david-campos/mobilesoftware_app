@@ -46,6 +46,16 @@
         android:layout_centerHorizontal="true"
         android:visibility="gone" />
 
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spCountryCode"
+        android:layout_alignLeft="@+id/ivLogo"
+        android:layout_alignStart="@+id/ivLogo"
+        android:layout_alignBottom="@+id/etPhoneNumberInput"
+        android:layout_marginBottom="8dp" />
+
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -54,23 +64,23 @@
         android:id="@+id/etPhoneNumberInput"
         android:layout_gravity="center_horizontal"
         android:layout_below="@+id/tvTextPhoneNumber"
+        android:layout_toEndOf="@+id/spCountryCode"
+        android:layout_toRightOf="@+id/spCountryCode"
         android:layout_alignRight="@+id/ivLogo"
         android:layout_alignEnd="@+id/ivLogo"
-        android:layout_alignLeft="@+id/ivLogo"
-        android:layout_alignStart="@+id/ivLogo"
+
         android:digits="+0123456789"
         android:imeActionId="@+id/login"
         android:imeActionLabel="@string/action_sign_in_short"
-        android:imeOptions="actionUnspecified"
-        />
+        android:imeOptions="actionUnspecified" />
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/log_in_register"
         android:id="@+id/btnLogin"
         android:layout_below="@+id/etPhoneNumberInput"
-        android:layout_alignLeft="@+id/etPhoneNumberInput"
-        android:layout_alignStart="@+id/etPhoneNumberInput"
+        android:layout_alignLeft="@+id/spCountryCode"
+        android:layout_alignStart="@+id/spCountryCode"
         android:layout_alignRight="@+id/etPhoneNumberInput"
         android:layout_alignEnd="@+id/etPhoneNumberInput" />
 </RelativeLayout>

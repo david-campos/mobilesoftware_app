@@ -77,4 +77,8 @@
     <string name="req_open_appointment">oappo</string>
     <string name="req_close_appointment">cappo</string>
     <string name="query_appointment_id">aid</string>
+    <string name="req_refuse_invitation">rinv</string>
+    <string name="req_accept_invitation">ainv</string>
+    <string name="query_refuse_invitation_reason">r</string>
+    <string name="req_set_pending_invitation">pinv</string>
 </resources>

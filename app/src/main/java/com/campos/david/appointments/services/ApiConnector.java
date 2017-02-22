@@ -174,6 +174,27 @@ public class ApiConnector {
         return getObjectFromApi(cv);
     }
 
+    public JSONObject refuseInvitation(int appointmentId, @NonNull String reason) {
+        ContentValues cv = new ContentValues(2);
+        cv.put(mContext.getString(R.string.query_appointment_id), appointmentId);
+        cv.put(mContext.getString(R.string.query_refuse_invitation_reason), reason);
+        cv.put(mContext.getString(R.string.query_request_key), mContext.getString(R.string.req_refuse_invitation));
+        return getObjectFromApi(cv);
+    }
+
+    public JSONObject acceptInvitation(int appointmentId) {
+        ContentValues cv = new ContentValues();
+        cv.put(mContext.getString(R.string.query_appointment_id), appointmentId);
+        cv.put(mContext.getString(R.string.query_request_key), mContext.getString(R.string.req_accept_invitation));
+        return getObjectFromApi(cv);
+    }
+
+    public JSONObject setInvitationPending(int appointmentId) {
+        ContentValues cv = new ContentValues();
+        cv.put(mContext.getString(R.string.query_appointment_id), appointmentId);
+        cv.put(mContext.getString(R.string.query_request_key), mContext.getString(R.string.req_set_pending_invitation));
+        return getObjectFromApi(cv);
+    }
 
     public JSONObject[] getAppointments() {
         ContentValues cv = new ContentValues();
@@ -231,7 +252,6 @@ public class ApiConnector {
         }
         return null;
     }
-
 
     private JSONObject getObjectFromApi(ContentValues params) {
         return getFromApi(params, JSONObject.class);

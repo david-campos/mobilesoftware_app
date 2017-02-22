@@ -21,7 +21,11 @@ public class AppointmentDiscussionService extends IntentService {
 
     public static final String ACTION_OPEN = "open-discussion";
     public static final String ACTION_CLOSE = "close-discussion";
+    public static final String ACTION_REFUSE = "refuse-invitation";
+    public static final String ACTION_ACCEPT = "accept-invitation";
+    public static final String ACTION_SET_PENDING = "set-pending-invitation";
     public static final String EXTRA_APPOINTMENT = "appointment";
+    public static final String EXTRA_REASON = "reason";
 
     public AppointmentDiscussionService() {
         super("AppointmentDiscussionService");
@@ -40,6 +44,16 @@ public class AppointmentDiscussionService extends IntentService {
                         json = connector.openAppointment(appointmentId);
                     } else if (ACTION_CLOSE.equals(action)) {
                         json = connector.closeAppointment(appointmentId);
+                    } else if (ACTION_ACCEPT.equals(action)) {
+                        json = connector.acceptInvitation(appointmentId);
+                    } else if (ACTION_SET_PENDING.equals(action)) {
+                        json = connector.setInvitationPending(appointmentId);
+                    } else if (ACTION_REFUSE.equals(action)) {
+                        String reason = intent.getStringExtra(EXTRA_REASON);
+                        if (reason == null) {
+                            return;
+                        }
+                        json = connector.refuseInvitation(appointmentId, reason);
                     }
                     // Reading answer
                     Parser parser = new Parser(this);
@@ -54,7 +68,7 @@ public class AppointmentDiscussionService extends IntentService {
                     // On API error ignore, so the app doesn't crash
                     // maybe in the future would be better to send some kind of broadcast
                     // to show the user a toast or something
-                    Log.e(TAG, "Error in API opening/closing appointment", e);
+                    Log.e(TAG, "Error in API opening/closing/accepting/refusing appointment", e);
                 }
             }
         }

@@ -7,6 +7,8 @@ import android.database.Cursor;
 import android.database.MergeCursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteDoneException;
+import android.database.sqlite.SQLiteStatement;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -463,12 +465,51 @@ public class ContentProvider extends android.content.ContentProvider {
         String[] tableAndUri = insertGetTableAndUri(uri);
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         db.beginTransaction();
+        SQLiteStatement checkInvitation = null;
+        if (tableAndUri[0].equals(InvitationsEntry.TABLE_NAME)) {
+            String query = "SELECT " + InvitationsEntry._ID +
+                    " FROM " + tableAndUri[0] +
+                    " WHERE " + InvitationsEntry.COLUMN_APPOINTMENT + "=? AND (" +
+                    InvitationsEntry.COLUMN_USER + "=? OR (? IS NULL AND " +
+                    InvitationsEntry.COLUMN_USER + " IS NULL))" +
+                    " LIMIT 1";
+            checkInvitation = db.compileStatement(query);
+        }
         try {
             for (ContentValues cv : values) {
+                // Invitations should be checked first
+                if (checkInvitation != null) {
+                    long id;
+                    checkInvitation.clearBindings();
+                    checkInvitation.bindLong(1, cv.getAsLong(InvitationsEntry.COLUMN_APPOINTMENT));
+                    Long user = cv.getAsLong(InvitationsEntry.COLUMN_USER);
+                    if (user != null) {
+                        checkInvitation.bindLong(2, user);
+                        checkInvitation.bindLong(3, user);
+                    } else {
+                        checkInvitation.bindNull(2);
+                        checkInvitation.bindNull(3);
+                    }
+
+                    try {
+                        id = checkInvitation.simpleQueryForLong();
+                    } catch (SQLiteDoneException e) {
+                        id = -1;
+                    }
+
+                    if (id != -1) {
+                        db.update(tableAndUri[0], cv,
+                                InvitationsEntry._ID + "=?", new String[]{Long.toString(id)});
+                        continue;
+                    }
+                }
                 long newID = db.insertWithOnConflict(tableAndUri[0], null, cv, SQLiteDatabase.CONFLICT_REPLACE);
                 if (newID <= 0) {
                     throw new SQLException("Failed to insert row into " + uri);
                 }
+            }
+            if (checkInvitation != null) {
+                checkInvitation.close();
             }
             db.setTransactionSuccessful();
             Context ctx = getContext();

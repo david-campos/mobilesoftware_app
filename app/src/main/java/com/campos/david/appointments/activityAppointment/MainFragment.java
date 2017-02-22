@@ -1,14 +1,12 @@
 package com.campos.david.appointments.activityAppointment;
 
-import android.annotation.TargetApi;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.PorterDuff;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -42,7 +40,7 @@ import java.util.Calendar;
 /**
  * Main fragment for the AppointmentActivity when the appointment has not been created by the user
  */
-public class MainFragment extends Fragment implements OnMapReadyCallback, LoaderManager.LoaderCallbacks<Cursor> {
+public class MainFragment extends Fragment implements OnMapReadyCallback, LoaderManager.LoaderCallbacks<Cursor>, ReasonPickerDialog.ReasonPickerDialogListener {
     public static final int LOADER_APPOINTMENT = 0;
 
     private static final String TAG = MainFragment.class.getSimpleName();
@@ -182,57 +180,59 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Loader
         return mMainView;
     }
 
+    private void throwAppointmentDiscussionService(@NonNull String action) {
+        throwAppointmentDiscussionService(action, null);
+    }
+
+    private void throwAppointmentDiscussionService(@NonNull String action, @Nullable String reason) {
+        Intent throwService = new Intent(getActivity().getApplicationContext(),
+                AppointmentDiscussionService.class);
+        throwService.setAction(action);
+        if (reason != null) {
+            throwService.putExtra(AppointmentDiscussionService.EXTRA_REASON, reason);
+        }
+        throwService.putExtra(AppointmentDiscussionService.EXTRA_APPOINTMENT, mAppointmentId);
+        getActivity().startService(throwService);
+    }
+
     public void toggleClosed() {
         if (mClosed != null) {
-            Intent throwService = new Intent(getActivity().getApplicationContext(),
-                    AppointmentDiscussionService.class);
             if (mClosed) {
-                throwService.setAction(AppointmentDiscussionService.ACTION_OPEN);
+                throwAppointmentDiscussionService(AppointmentDiscussionService.ACTION_OPEN);
             } else {
-                throwService.setAction(AppointmentDiscussionService.ACTION_CLOSE);
+                throwAppointmentDiscussionService(AppointmentDiscussionService.ACTION_CLOSE);
             }
-            throwService.putExtra(AppointmentDiscussionService.EXTRA_APPOINTMENT, mAppointmentId);
-            getActivity().startService(throwService);
+            mClosed = null;
         }
     }
 
     public void toggleAccepted() {
         if (mState != null) {
-            ContentValues cv = new ContentValues();
             if (mState.equals("pending")) {
-                cv.put(DBContract.InvitationsEntry.COLUMN_STATE, "accepted");
+                throwAppointmentDiscussionService(AppointmentDiscussionService.ACTION_ACCEPT);
             } else {
-                cv.put(DBContract.InvitationsEntry.COLUMN_STATE, "pending");
+                throwAppointmentDiscussionService(AppointmentDiscussionService.ACTION_SET_PENDING);
             }
             mState = null;
-            getActivity().getContentResolver().update(
-                    DBContract.InvitationsEntry.CONTENT_URI,
-                    cv,
-                    DBContract.InvitationsEntry.COLUMN_USER + " IS NULL AND " +
-                            DBContract.InvitationsEntry.COLUMN_APPOINTMENT + "=?",
-                    new String[]{Integer.toString(mAppointmentId)}
-            );
         }
     }
 
     public void toggleRefused() {
         if (mState != null) {
-            ContentValues cv = new ContentValues();
             if (mState.equals("pending")) {
-                //TODO: ask for a reason
-                cv.put(DBContract.InvitationsEntry.COLUMN_STATE, "refused");
+                ReasonPickerDialog dialog = new ReasonPickerDialog();
+                dialog.setReasonPickedListener(this);
+                dialog.show(getFragmentManager(), "ReasonPickerDialog");
             } else {
-                cv.put(DBContract.InvitationsEntry.COLUMN_STATE, "pending");
+                throwAppointmentDiscussionService(AppointmentDiscussionService.ACTION_SET_PENDING);
             }
             mState = null;
-            getActivity().getContentResolver().update(
-                    DBContract.InvitationsEntry.CONTENT_URI,
-                    cv,
-                    DBContract.InvitationsEntry.COLUMN_USER + " IS NULL AND " +
-                            DBContract.InvitationsEntry.COLUMN_APPOINTMENT + "=?",
-                    new String[]{Integer.toString(mAppointmentId)}
-            );
         }
+    }
+
+    @Override
+    public void reasonPicked(String reasonName) {
+        throwAppointmentDiscussionService(AppointmentDiscussionService.ACTION_REFUSE, reasonName);
     }
 
     public void suggestChange() {
@@ -358,7 +358,6 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Loader
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mCurrentCursor = data;

@@ -9,6 +9,8 @@
     <string name="session_key_key" translatable="false">session_key</string>
     <string name="session_id_key" translatable="false">session_id</string>
     <string name="session_user_id_key" translatable="false">session_user_id</string>
+    <string name="session_user_name_key" translatable="false">session_user_name</string>
+    <string name="session_user_pic_id_key" translatable="false">session_user_picture_id</string>
 
     <string name="common_IDD_for_international_calls">00</string>
 
@@ -115,4 +117,7 @@
     <string name="description_not_valid_text">Enter a valid description</string>
     <string name="name_not_valid_text">Please, enter a valid name</string>
     <string name="text_getting_account_information">Getting account information…</string>
+    <string name="pref_username_key">pref_username</string>
+    <string name="pref_username_title">Username</string>
+    <string name="pref_username_dialog_title">Username</string>
 </resources>

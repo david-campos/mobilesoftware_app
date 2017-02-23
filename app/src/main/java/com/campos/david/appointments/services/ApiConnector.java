@@ -69,18 +69,10 @@ public class ApiConnector {
         return null;
     }
 
-    public int whoAmI() {
+    public JSONObject whoAmI() {
         ContentValues cv = new ContentValues();
         cv.put(mContext.getString(R.string.query_request_key), mContext.getString(R.string.req_who_am_i));
-        JSONObject me = getObjectFromApi(cv);
-        if (me.has(mContext.getString(R.string.response_id))) {
-            try {
-                return me.getInt(mContext.getString(R.string.response_id));
-            } catch (JSONException e) {
-                Log.e(TAG, "Error getting who am I", e);
-            }
-        }
-        return -1;
+        return getObjectFromApi(cv);
     }
 
     /**
@@ -193,6 +185,13 @@ public class ApiConnector {
         ContentValues cv = new ContentValues();
         cv.put(mContext.getString(R.string.query_appointment_id), appointmentId);
         cv.put(mContext.getString(R.string.query_request_key), mContext.getString(R.string.req_set_pending_invitation));
+        return getObjectFromApi(cv);
+    }
+
+    public JSONObject changeName(String name) {
+        ContentValues cv = new ContentValues();
+        cv.put(mContext.getString(R.string.query_profile_name), name);
+        cv.put(mContext.getString(R.string.query_request_key), mContext.getString(R.string.req_change_username));
         return getObjectFromApi(cv);
     }
 

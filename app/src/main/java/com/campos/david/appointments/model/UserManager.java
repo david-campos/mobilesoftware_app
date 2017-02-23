@@ -1,5 +1,6 @@
 package com.campos.david.appointments.model;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,6 +10,7 @@ import android.util.Log;
 import com.campos.david.appointments.R;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Operations related with managing users
@@ -27,6 +29,15 @@ public class UserManager {
     public void insertUsers(ContentValues users[]) {
         int inserted = mContext.getContentResolver().bulkInsert(DBContract.UsersEntry.CONTENT_URI, users);
         Log.d(mContext.getClass().getSimpleName(), "Inserted " + inserted + " users.");
+    }
+
+    @SuppressLint("CommitPrefEdits")
+    public void saveMe(JSONObject me) throws JSONException {
+        mSessionPreferences.edit()
+                .putInt(mContext.getString(R.string.session_user_id_key), me.getInt(mContext.getString(R.string.response_id)))
+                .putInt(mContext.getString(R.string.session_user_pic_id_key), me.getInt(mContext.getString(R.string.response_user_picture)))
+                .putString(mContext.getString(R.string.session_user_name_key), me.getString(mContext.getString(R.string.response_user_name)))
+                .commit();
     }
 
     public boolean isMe(int userId) {

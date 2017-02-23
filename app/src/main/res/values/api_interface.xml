@@ -81,4 +81,6 @@
     <string name="req_accept_invitation">ainv</string>
     <string name="query_refuse_invitation_reason">r</string>
     <string name="req_set_pending_invitation">pinv</string>
+    <string name="query_profile_name">n</string>
+    <string name="req_change_username">cname</string>
 </resources>

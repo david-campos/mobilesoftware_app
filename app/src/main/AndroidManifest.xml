@@ -79,6 +79,9 @@
 
         <service
             android:name=".services.AppointmentDiscussionService"
+            android:exported="false" />
+        <service
+            android:name=".services.ProfileTasksService"
             android:exported="false"></service>
     </application>
 

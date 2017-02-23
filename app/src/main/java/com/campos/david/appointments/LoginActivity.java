@@ -2,6 +2,7 @@ package com.campos.david.appointments;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +16,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -27,9 +29,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.campos.david.appointments.activityMain.MainActivity;
+import com.campos.david.appointments.model.UserManager;
 import com.campos.david.appointments.services.ApiConnector;
 import com.campos.david.appointments.services.UpdateTypesAndReasonsService;
 import com.campos.david.appointments.services.UpdateUsersService;
+
+import org.json.JSONException;
 
 import static android.Manifest.permission.READ_CONTACTS;
 // TODO: cancel AsyncTask on UI destroyed
@@ -37,6 +42,7 @@ import static android.Manifest.permission.READ_CONTACTS;
  * LoginActivity activity of the app
  */
 public class LoginActivity extends AppCompatActivity {
+    private static final String TAG = LoginActivity.class.getSimpleName();
     /**
      * Id to identity READ_CONTACTS permission request.
      */
@@ -226,6 +232,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
 
+        @SuppressLint("CommitPrefEdits")
         @Override
         protected Boolean doInBackground(String... params) {
             ApiConnector connector = new ApiConnector(mContext);
@@ -250,11 +257,11 @@ public class LoginActivity extends AppCompatActivity {
             int session_user_id = mSession.getInt(getString(R.string.session_user_id_key), -1);
             if (session_user_id == -1) {
                 publishProgress(getString(R.string.text_getting_account_information));
-                int userId = connector.whoAmI();
-                if (userId != -1) {
-                    mSession.edit().putInt(getString(R.string.session_user_id_key), userId)
-                            .commit();
-                } else {
+                UserManager userManager = new UserManager(LoginActivity.this);
+                try {
+                    userManager.saveMe(connector.whoAmI());
+                } catch (JSONException e) {
+                    Log.e(TAG, "Exception getting my id", e);
                     return false;
                 }
             }

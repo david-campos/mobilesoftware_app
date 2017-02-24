@@ -95,7 +95,6 @@ public class PickUsersAdapter extends CursorRecyclerViewAdapter<PickUsersAdapter
         final int iconId = cursor.getInt(Query.COL_PICTURE);
         String uri = mContext.getString(R.string.api_profile_pics_format, mApiUri, iconId);
 
-        viewHolder.setUserId(id);
         viewHolder.setPhone(phone);
         viewHolder.setBlocked(blocked);
 
@@ -141,7 +140,6 @@ public class PickUsersAdapter extends CursorRecyclerViewAdapter<PickUsersAdapter
         public final TextView mPhoneView;
         public final ImageView mProfilePictureView;
 
-        private int mUserId = 0;
         private boolean mBlocked = false;
         private String mPhone = null;
 
@@ -159,14 +157,6 @@ public class PickUsersAdapter extends CursorRecyclerViewAdapter<PickUsersAdapter
 
         public void setPhone(String phone) {
             this.mPhone = phone;
-        }
-
-        public int getUserId() {
-            return mUserId;
-        }
-
-        public void setUserId(int mUserId) {
-            this.mUserId = mUserId;
         }
 
         public boolean isBlocked() {

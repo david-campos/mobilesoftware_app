@@ -8,7 +8,9 @@ import android.database.Cursor;
 import android.util.Log;
 
 import com.campos.david.appointments.R;
+import com.campos.david.appointments.services.Parser;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -38,6 +40,21 @@ public class UserManager {
                 .putInt(mContext.getString(R.string.session_user_pic_id_key), me.getInt(mContext.getString(R.string.response_user_picture)))
                 .putString(mContext.getString(R.string.session_user_name_key), me.getString(mContext.getString(R.string.response_user_name)))
                 .commit();
+        if (me.has(mContext.getString(R.string.response_profile_blocked_users))) {
+            JSONArray blocked = me.getJSONArray(mContext.getString(R.string.response_profile_blocked_users));
+            Parser parser = new Parser(mContext);
+            ContentValues[] cvs = new ContentValues[blocked.length()];
+            for (int i = 0; i < blocked.length(); i++) {
+                cvs[i] = parser.getUserFrom(blocked.getJSONObject(i));
+                cvs[i].put(DBContract.UsersEntry.COLUMN_BLOCKED, true);
+            }
+            // Clear blocked users before inserting
+            ContentValues clearBlocked = new ContentValues(1);
+            clearBlocked.put(DBContract.UsersEntry.COLUMN_BLOCKED, false);
+            mContext.getContentResolver().update(DBContract.UsersEntry.CONTENT_URI, clearBlocked,
+                    DBContract.UsersEntry.COLUMN_BLOCKED + "=?", new String[]{"1"});
+            insertUsers(cvs);
+        }
     }
 
     public boolean isMe(int userId) {

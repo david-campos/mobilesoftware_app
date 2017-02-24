@@ -1,7 +1,7 @@
 package com.campos.david.appointments.activityAppointment;
 
-import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 
 import com.campos.david.appointments.R;
 import com.campos.david.appointments.model.DBContract;
+import com.campos.david.appointments.services.ProfileTasksService;
 
 /**
  * A fragment representing a list of Items.
@@ -114,10 +115,10 @@ public class InvitedListFragment extends Fragment implements LoaderManager.Loade
         }
 
         String[] values = mAdapter.getItem(position);
-        final String userId = values[InvitedListAdapter.COL_ID];
+        final String userPhone = values[InvitedListAdapter.COL_PHONE];
         boolean blocked = (Integer.parseInt(values[InvitedListAdapter.COL_BLOCKED]) != 0);
         String text = String.format("%s (%s)%s",
-                values[InvitedListAdapter.COL_NAME], values[InvitedListAdapter.COL_PHONE],
+                values[InvitedListAdapter.COL_NAME], userPhone,
                 blocked ? getResources().getString(R.string.text_x_is_blocked) : "");
         View view = getView();
         if (view != null) {
@@ -127,22 +128,22 @@ public class InvitedListFragment extends Fragment implements LoaderManager.Loade
                 listener = new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ContentValues cv = new ContentValues();
-                        cv.put(DBContract.UsersEntry.COLUMN_BLOCKED, 0);
-                        getActivity().getContentResolver().update(
-                                DBContract.UsersEntry.CONTENT_URI,
-                                cv, DBContract.UsersEntry._ID + "=?", new String[]{userId});
+                        Intent profileTaskService =
+                                new Intent(getActivity().getApplicationContext(), ProfileTasksService.class);
+                        profileTaskService.setAction(ProfileTasksService.ACTION_UNBLOCK_USER);
+                        profileTaskService.putExtra(ProfileTasksService.EXTRA_PHONE, userPhone);
+                        getActivity().startService(profileTaskService);
                     }
                 };
             } else {
                 listener = new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ContentValues cv = new ContentValues();
-                        cv.put(DBContract.UsersEntry.COLUMN_BLOCKED, 1);
-                        getActivity().getContentResolver().update(
-                                DBContract.UsersEntry.CONTENT_URI,
-                                cv, DBContract.UsersEntry._ID + "=?", new String[]{userId});
+                        Intent profileTaskService =
+                                new Intent(getActivity().getApplicationContext(), ProfileTasksService.class);
+                        profileTaskService.setAction(ProfileTasksService.ACTION_BLOCK_USER);
+                        profileTaskService.putExtra(ProfileTasksService.EXTRA_PHONE, userPhone);
+                        getActivity().startService(profileTaskService);
                     }
                 };
             }

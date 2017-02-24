@@ -36,6 +36,9 @@ import com.campos.david.appointments.services.UpdateUsersService;
 
 import org.json.JSONException;
 
+import java.util.Calendar;
+import java.util.TimeZone;
+
 import static android.Manifest.permission.READ_CONTACTS;
 // TODO: cancel AsyncTask on UI destroyed
 /**
@@ -73,9 +76,8 @@ public class LoginActivity extends AppCompatActivity {
         mSession = getSharedPreferences(getString(R.string.session_file_key), Context.MODE_PRIVATE);
         String session_key = mSession.getString(getString(R.string.session_key_key), null);
         int session_user_id = mSession.getInt(getString(R.string.session_user_id_key), -1);
-        Boolean firstUpdateDone = mSession.getBoolean(getString(R.string.session_users_update_done_key), false);
         Boolean typesAndReasonsDone = mSession.getBoolean(getString(R.string.session_types_reasons_done_key), false);
-        if (session_key != null && session_user_id != -1 && firstUpdateDone && typesAndReasonsDone) {
+        if (session_key != null && session_user_id != -1 && typesAndReasonsDone) {
             throwMainActivity();
             return;
         }
@@ -279,16 +281,24 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
 
-            Boolean firstUpdateDone = mSession.getBoolean(getString(R.string.session_users_update_done_key), false);
-            if (!firstUpdateDone && mayRequestContacts()) {
+            String lastUserUpdate = mSession.getString(getString(R.string.session_users_last_update), null);
+            if (lastUserUpdate != null && mayRequestContacts()) {
                 publishProgress(getString(R.string.text_updating_users));
                 try {
+                    Calendar c = Calendar.getInstance();
+                    c.setTimeInMillis(System.currentTimeMillis());
+                    c.setTimeZone(TimeZone.getTimeZone("UTC"));
+                    String nowUtc = getString(R.string.api_timestamp_format_detailed,
+                            c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH),
+                            c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), c.get(Calendar.SECOND));
+
                     UpdateUsersService.usersUpdate(LoginActivity.this);
                     SharedPreferences.Editor editor = mSession.edit();
-                    editor.putBoolean(mContext.getString(R.string.session_users_update_done_key), true);
+
+                    editor.putString(mContext.getString(R.string.session_users_last_update), nowUtc);
                     editor.commit();
                 } catch (NullPointerException e) {
-                    // Some problem with the API. Ignore, we will try next time!
+                    // Some problem with the API. Ignore, we will try later!
                 }
             }
             return true;

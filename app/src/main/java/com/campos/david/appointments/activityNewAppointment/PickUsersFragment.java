@@ -1,7 +1,7 @@
 package com.campos.david.appointments.activityNewAppointment;
 
-import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,7 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.campos.david.appointments.R;
-import com.campos.david.appointments.model.DBContract;
+import com.campos.david.appointments.services.ProfileTasksService;
 
 import java.util.Collection;
 
@@ -132,7 +132,7 @@ public class PickUsersFragment extends Fragment implements PickUsersAdapter.Pick
                 mSnackBar.setAction(R.string.text_unblock, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        unblockUser(holder.getUserId());
+                        unblockUser(holder.getPhone());
                     }
                 })
                         .setActionTextColor(
@@ -150,11 +150,11 @@ public class PickUsersFragment extends Fragment implements PickUsersAdapter.Pick
         }
     }
 
-    private void unblockUser(int id) {
-        ContentValues cv = new ContentValues();
-        cv.put(DBContract.UsersEntry.COLUMN_BLOCKED, 0);
-        getActivity().getContentResolver().update(
-                DBContract.UsersEntry.CONTENT_URI,
-                cv, DBContract.UsersEntry._ID + "=?", new String[]{Integer.toString(id)});
+    private void unblockUser(String userPhone) {
+        Intent profileTaskService =
+                new Intent(getActivity().getApplicationContext(), ProfileTasksService.class);
+        profileTaskService.setAction(ProfileTasksService.ACTION_UNBLOCK_USER);
+        profileTaskService.putExtra(ProfileTasksService.EXTRA_PHONE, userPhone);
+        getActivity().startService(profileTaskService);
     }
 }

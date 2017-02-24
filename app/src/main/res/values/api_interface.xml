@@ -5,6 +5,7 @@
     <string name="api_types_format">%1$s/type_pics/type%2$d.png</string>
     <string name="api_profile_pics_format">%1$s/profile_pics/p%2$d.png</string>
     <string name="api_timestamp_format">%1$04d-%2$02d-%3$02d %4$02d:%5$02d:00</string>
+    <string name="api_timestamp_format_detailed">%1$04d-%2$02d-%3$02d %4$02d:%5$02d:%6$02d</string>
     <integer name="appointment_name_max_length">50</integer>
     <integer name="user_phone_max_length">22</integer>
     <integer name="user_name_max_length">30</integer>
@@ -83,4 +84,9 @@
     <string name="req_set_pending_invitation">pinv</string>
     <string name="query_profile_name">n</string>
     <string name="req_change_username">cname</string>
+    <string name="query_block_user_phone">p</string>
+    <string name="req_block_user">block</string>
+    <string name="req_unblock_user">unblock</string>
+    <string name="query_unblock_user_phone">p</string>
+    <string name="response_profile_blocked_users">blocked_users</string>
 </resources>

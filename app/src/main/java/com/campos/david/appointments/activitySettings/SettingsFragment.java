@@ -59,6 +59,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     }
 
     @Override
+    public void onDetach() {
+        mSession.unregisterOnSharedPreferenceChangeListener(this);
+        super.onDetach();
+    }
+
+    @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(getString(R.string.session_user_name_key))) {
             if (mUsername != null) {

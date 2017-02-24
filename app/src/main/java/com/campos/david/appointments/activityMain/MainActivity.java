@@ -21,6 +21,7 @@ import com.campos.david.appointments.activityNewAppointment.NewAppointmentActivi
 import com.campos.david.appointments.activitySettings.SettingsActivity;
 import com.campos.david.appointments.model.DBContract;
 import com.campos.david.appointments.services.UpdateAppointmentsService;
+import com.campos.david.appointments.services.UpdateUsersService;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,6 +44,9 @@ public class MainActivity extends AppCompatActivity {
         // Update appointments
         Intent throwingService = new Intent(getApplicationContext(), UpdateAppointmentsService.class);
         startService(throwingService);
+        // Update users
+        Intent throwingUsersUpdate = new Intent(getApplicationContext(), UpdateUsersService.class);
+        startService(throwingUsersUpdate);
 
         if (viewPager != null && tabLayout != null) {
             // Set PagerAdapter so that it can display items

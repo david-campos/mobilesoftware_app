@@ -93,6 +93,11 @@ public class ApiConnector {
         }
         ContentValues cv = new ContentValues();
         cv.put(mContext.getString(R.string.query_param_phones), builder.toString());
+        String lastUpdate = mSessionPreferences.getString(
+                mContext.getString(R.string.session_users_last_update), null);
+        if (lastUpdate != null) {
+            cv.put("l", lastUpdate);
+        }
         cv.put(mContext.getString(R.string.query_request_key), mContext.getString(R.string.req_filter_user_list));
         JSONArray result = getArrayFromApi(cv);
         if (result != null) {
@@ -182,16 +187,30 @@ public class ApiConnector {
     }
 
     public JSONObject setInvitationPending(int appointmentId) {
-        ContentValues cv = new ContentValues();
+        ContentValues cv = new ContentValues(2);
         cv.put(mContext.getString(R.string.query_appointment_id), appointmentId);
         cv.put(mContext.getString(R.string.query_request_key), mContext.getString(R.string.req_set_pending_invitation));
         return getObjectFromApi(cv);
     }
 
     public JSONObject changeName(String name) {
-        ContentValues cv = new ContentValues();
+        ContentValues cv = new ContentValues(2);
         cv.put(mContext.getString(R.string.query_profile_name), name);
         cv.put(mContext.getString(R.string.query_request_key), mContext.getString(R.string.req_change_username));
+        return getObjectFromApi(cv);
+    }
+
+    public JSONObject blockUser(String phone) {
+        ContentValues cv = new ContentValues(2);
+        cv.put(mContext.getString(R.string.query_block_user_phone), phone);
+        cv.put(mContext.getString(R.string.query_request_key), mContext.getString(R.string.req_block_user));
+        return getObjectFromApi(cv);
+    }
+
+    public JSONObject unblockUser(String phone) {
+        ContentValues cv = new ContentValues(2);
+        cv.put(mContext.getString(R.string.query_unblock_user_phone), phone);
+        cv.put(mContext.getString(R.string.query_request_key), mContext.getString(R.string.req_unblock_user));
         return getObjectFromApi(cv);
     }
 
@@ -273,6 +292,7 @@ public class ApiConnector {
         HttpURLConnection urlConnection = null;
         try {
             Uri connectionUri = buildConnectionUri(params);
+            Log.d(TAG, "Connecting to: " + connectionUri);
             urlConnection = connect(connectionUri);
             String jsonStr = readInputStream(urlConnection);
             JSONObject response = new JSONObject(jsonStr);

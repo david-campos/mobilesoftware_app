@@ -170,7 +170,6 @@ public class AboutActivity extends AppCompatActivity {
 
         @Override
         public void run() {
-            initialize();
             while (true) {
                 // Latch the SurfaceTexture when it becomes available.  We have to wait for
                 // the TextureView to create it.
@@ -205,6 +204,7 @@ public class AboutActivity extends AppCompatActivity {
                 }
                 surface = new Surface(mSurface);
             }
+            initialize();
             double last = SystemClock.elapsedRealtime();
             // Main loop of animation
             while (true) {

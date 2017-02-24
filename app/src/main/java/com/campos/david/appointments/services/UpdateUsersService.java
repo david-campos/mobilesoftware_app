@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.provider.ContactsContract;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import com.campos.david.appointments.CountryCodes;
 import com.campos.david.appointments.R;
@@ -26,7 +27,12 @@ public class UpdateUsersService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        usersUpdate(this, true);
+        try {
+            usersUpdate(this, true);
+        } catch (Exception e) {
+            Log.e(TAG, "Exception updating users", e);
+        }
+
     }
 
     public static void usersUpdate(Context ctx) {

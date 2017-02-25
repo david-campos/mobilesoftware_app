@@ -3,19 +3,19 @@ package com.campos.david.appointments.services;
 import android.app.IntentService;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.campos.david.appointments.R;
 import com.campos.david.appointments.model.AppointmentManager;
+import com.campos.david.appointments.model.DBContract;
 
 import org.json.JSONObject;
 
+import java.util.Calendar;
 
-/**
- * An {@link IntentService} subclass for handling asynchronous task requests in
- * a service on a separate handler thread.
- * <p/>
- * TODO: Customize class - update intent actions and extra parameters.
- */
 public class AppointmentDiscussionService extends IntentService {
     private static final String TAG = AppointmentDiscussionService.class.getSimpleName();
 
@@ -24,8 +24,14 @@ public class AppointmentDiscussionService extends IntentService {
     public static final String ACTION_REFUSE = "refuse-invitation";
     public static final String ACTION_ACCEPT = "accept-invitation";
     public static final String ACTION_SET_PENDING = "set-pending-invitation";
+    public static final String ACTION_CREATE_PROPOSAL = "new-proposal";
+
     public static final String EXTRA_APPOINTMENT = "appointment";
     public static final String EXTRA_REASON = "reason";
+    /**
+     * Key for the timestamp extra on the intent, should be of type long and be ON MILLIS
+     */
+    public static final String EXTRA_TIMESTAMP = "timestamp";
 
     public AppointmentDiscussionService() {
         super("AppointmentDiscussionService");
@@ -54,10 +60,13 @@ public class AppointmentDiscussionService extends IntentService {
                             return;
                         }
                         json = connector.refuseInvitation(appointmentId, reason);
+                    } else if (ACTION_CREATE_PROPOSAL.equals(action)) {
+                        handleCreateProposal(intent, appointmentId);
+                        return; // Answer is different is a proposal, not the complete appointment
                     }
                     // Reading answer
-                    Parser parser = new Parser(this);
                     if (json != null) {
+                        Parser parser = new Parser(this);
                         ContentValues appCvs = parser.getAppointmentFrom(json);
                         ContentValues currentProposalCvs = parser.getCurrentPropositionFrom(json);
                         ContentValues[] invitationsCvs = parser.getInvitationsFrom(json);
@@ -71,6 +80,42 @@ public class AppointmentDiscussionService extends IntentService {
                     Log.e(TAG, "Error in API opening/closing/accepting/refusing appointment", e);
                 }
             }
+        }
+    }
+
+    private void handleCreateProposal(@NonNull Intent intent, int appointmentId) {
+        String reason = intent.getStringExtra(EXTRA_REASON);
+        long timestamp = intent.getLongExtra(EXTRA_TIMESTAMP, -1);
+        if (reason == null || timestamp == -1) {
+            return;
+        }
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(timestamp);
+        String timestampStr = getString(R.string.api_timestamp_format,
+                c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH),
+                c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE));
+        Cursor cur = getContentResolver().query(
+                Uri.withAppendedPath(DBContract.AppointmentsEntry.CONTENT_URI, Integer.toString(appointmentId)),
+                new String[]{
+                        DBContract.PropositionsEntry.TABLE_NAME + "." + DBContract.PropositionsEntry.COLUMN_PLACE_LAT,
+                        DBContract.PropositionsEntry.TABLE_NAME + "." + DBContract.PropositionsEntry.COLUMN_PLACE_LON,
+                        DBContract.PropositionsEntry.TABLE_NAME + "." + DBContract.PropositionsEntry.COLUMN_PLACE_NAME},
+                null, null, null);
+        if (cur != null) {
+            if (cur.moveToFirst()) {
+                ApiConnector connector = new ApiConnector(this);
+                double lat = cur.getDouble(0);
+                double lon = cur.getDouble(1);
+                String place = cur.getString(2);
+                JSONObject json = connector.createProposal(place, timestampStr, lon, lat, reason,
+                        appointmentId);
+                if (json == null) {
+                    // We don't need to save it as it is not our business (only creator can
+                    // administrate them)
+                    Log.e(TAG, "Some error creatingProposal");
+                }
+            }
+            cur.close();
         }
     }
 }

@@ -314,7 +314,6 @@ public class AppointmentDefinitionFragment extends Fragment
 
     /**
      * Called when mGoogleApiClient gets to connect.
-     * We call try to get location, where location settings will be checked
      *
      * @param bundle a bundle
      */
@@ -339,7 +338,6 @@ public class AppointmentDefinitionFragment extends Fragment
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d(TAG, "Activity result: " + resultCode);
         if (requestCode == PLACE_PICKER_REQUEST && resultCode == Activity.RESULT_OK) {
             mPlace = PlacePicker.getPlace(getActivity(), data);
             mPlaceTextView.setText(mPlace.getName().toString());

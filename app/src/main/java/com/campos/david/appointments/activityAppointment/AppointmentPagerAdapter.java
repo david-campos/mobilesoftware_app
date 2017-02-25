@@ -1,6 +1,5 @@
 package com.campos.david.appointments.activityAppointment;
 
-import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -11,28 +10,31 @@ import android.support.v4.app.FragmentPagerAdapter;
 public class AppointmentPagerAdapter extends FragmentPagerAdapter {
     public static final String[] PAGE_NAMES = {"Invited", "Main", "Suggestions"};
 
+    public static final int PAGE_INVITED = 0;
+    public static final int PAGE_MAIN = 1;
+    public static final int PAGE_SUGGESTIONS = 2;
+
+
     private int mAppointmentId;
     private boolean mAppointmentClosed;
     private boolean mUserIsCreator;
-    private Context mContext;
 
     public AppointmentPagerAdapter(int appointmentId, boolean userIsCreator, boolean appointmentClosed,
-                                   Context context, FragmentManager fm) {
+                                   FragmentManager fm) {
         super(fm);
         mUserIsCreator = userIsCreator;
         mAppointmentId = appointmentId;
         mAppointmentClosed = appointmentClosed;
-        mContext = context;
     }
 
     @Override
     public Fragment getItem(int position) {
         switch (position) {
-            case 0:
+            case PAGE_INVITED:
                 return InvitedListFragment.newInstance(mAppointmentId);
-            case 1:
+            case PAGE_MAIN:
                 return MainFragment.newInstance(mAppointmentId, mAppointmentClosed, mUserIsCreator);
-            case 2:
+            case PAGE_SUGGESTIONS:
                 return SuggestionsFragment.newInstance(mAppointmentId);
         }
         throw new IndexOutOfBoundsException("Position " + position + " isn't accepted for this pager.");

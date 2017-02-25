@@ -7,7 +7,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 
 import com.campos.david.appointments.R;
 
@@ -38,15 +37,6 @@ public class AppointmentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_appointment);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar bar = getSupportActionBar();
-        // lol, it shouldn't be, but let's check it
-        if (bar != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-        }
-
         Intent intent = getIntent();
         if (intent != null) {
             int id = intent.getIntExtra(EXTRA_APPOINTMENT_ID, 0);
@@ -54,11 +44,16 @@ public class AppointmentActivity extends AppCompatActivity {
             boolean appointmentClosed = intent.getBooleanExtra(EXTRA_APPOINTMENT_CLOSED, false);
             String appointmentName = intent.getStringExtra(EXTRA_APPOINTMENT_NAME);
 
-            toolbar.setSubtitle(appointmentName);
+            ActionBar bar = getSupportActionBar();
+            if (bar != null) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                getSupportActionBar().setDisplayShowHomeEnabled(true);
+                bar.setSubtitle(appointmentName);
+            }
 
             // Create the adapter that will return a fragment for each of the three
             // primary sections of the activity.
-            mSectionsPagerAdapter = new AppointmentPagerAdapter(id, userIsCreator, appointmentClosed, this, getSupportFragmentManager());
+            mSectionsPagerAdapter = new AppointmentPagerAdapter(id, userIsCreator, appointmentClosed, getSupportFragmentManager());
 
             // Set up the ViewPager with the sections adapter.
             mViewPager = (ViewPager) findViewById(R.id.container);

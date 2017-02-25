@@ -76,7 +76,6 @@ public class SuggestionsFragment extends Fragment
 
     @Override
     public void onSuggestionInteraction(int number) {
-
     }
 
     @Override

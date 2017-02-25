@@ -1,5 +1,8 @@
 package com.campos.david.appointments.activityAppointment;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -13,11 +16,15 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.campos.david.appointments.R;
 import com.campos.david.appointments.model.DBContract;
@@ -66,12 +73,16 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Loader
     private static final String APPOINTMENT_CLOSE = "app-close";
     private static final String APPOINTMENT_MINE = "app-mine";
 
+    private static final int REQUEST_PROPOSAL = 0;
+    private static final int REQUEST_REFUSE = 1;
+
     private int mAppointmentId = 0;
     private boolean mIsMyAppointment;
     private GoogleMap mMap = null;
     private Cursor mCurrentCursor = null;
     private String mState = null;
     private Boolean mClosed = null;
+    private long mPickedTime;
 
     private boolean mWithMap;
     private MapView mMapView;
@@ -165,7 +176,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Loader
                 mSuggestChange.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        suggestChange();
+                        showDatePickerDialog();
                     }
                 });
                 mRefuseInvitation.setOnClickListener(new View.OnClickListener() {
@@ -176,7 +187,6 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Loader
                 });
             }
         }
-
         return mMainView;
     }
 
@@ -208,10 +218,10 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Loader
 
     public void toggleAccepted() {
         if (mState != null) {
-            if (mState.equals("pending")) {
-                throwAppointmentDiscussionService(AppointmentDiscussionService.ACTION_ACCEPT);
-            } else {
+            if (mState.equals("accepted")) {
                 throwAppointmentDiscussionService(AppointmentDiscussionService.ACTION_SET_PENDING);
+            } else {
+                throwAppointmentDiscussionService(AppointmentDiscussionService.ACTION_ACCEPT);
             }
             mState = null;
         }
@@ -219,23 +229,101 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Loader
 
     public void toggleRefused() {
         if (mState != null) {
-            if (mState.equals("pending")) {
+            if (mState.equals("refused")) {
+                throwAppointmentDiscussionService(AppointmentDiscussionService.ACTION_SET_PENDING);
+            } else {
                 ReasonPickerDialog dialog = new ReasonPickerDialog();
                 dialog.setReasonPickedListener(this);
+                dialog.setRequestId(REQUEST_REFUSE);
                 dialog.show(getFragmentManager(), "ReasonPickerDialog");
-            } else {
-                throwAppointmentDiscussionService(AppointmentDiscussionService.ACTION_SET_PENDING);
             }
             mState = null;
         }
     }
 
     @Override
-    public void reasonPicked(String reasonName) {
-        throwAppointmentDiscussionService(AppointmentDiscussionService.ACTION_REFUSE, reasonName);
+    public void reasonPicked(final String reasonName, final int requestId) {
+        switch (requestId) {
+            case REQUEST_REFUSE:
+                throwAppointmentDiscussionService(AppointmentDiscussionService.ACTION_REFUSE, reasonName);
+                break;
+            case REQUEST_PROPOSAL:
+                Calendar c = Calendar.getInstance();
+                c.setTimeInMillis(mPickedTime);
+                String pickedTimeStr = getString(R.string.timestamp_format,
+                        c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH),
+                        c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE));
+                new AlertDialog.Builder(getActivity())
+                        .setTitle(R.string.title_suggest_change)
+                        .setMessage(getString(R.string.message_suggest_change, pickedTimeStr, reasonName))
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                Intent proposalCreationIntent = new Intent(getActivity().getApplicationContext(),
+                                        AppointmentDiscussionService.class);
+                                proposalCreationIntent.setAction(AppointmentDiscussionService.ACTION_CREATE_PROPOSAL);
+                                proposalCreationIntent.putExtra(AppointmentDiscussionService.EXTRA_APPOINTMENT, mAppointmentId);
+                                proposalCreationIntent.putExtra(AppointmentDiscussionService.EXTRA_REASON, reasonName);
+                                proposalCreationIntent.putExtra(AppointmentDiscussionService.EXTRA_TIMESTAMP, mPickedTime);
+                                getActivity().startService(proposalCreationIntent);
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, null).show();
+                break;
+        }
     }
 
-    public void suggestChange() {
+    private void showDatePickerDialog() {
+        // Get Current Date
+        Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
+
+        Log.d(TAG, "Showing DatePickerDialog");
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear,
+                                          int dayOfMonth) {
+                        Calendar newTimestampValue = Calendar.getInstance();
+                        newTimestampValue.set(Calendar.YEAR, year);
+                        newTimestampValue.set(Calendar.MONTH, monthOfYear);
+                        newTimestampValue.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                        showTimePickerDialog(newTimestampValue);
+                    }
+                }, year, month, day);
+        datePickerDialog.show();
+    }
+
+    private void showTimePickerDialog(final Calendar calendar) {
+        // Get Current Time
+        Calendar c = Calendar.getInstance();
+        int hour = c.get(Calendar.HOUR_OF_DAY);
+        int minute = c.get(Calendar.MINUTE);
+
+        // Launch Time Picker Dialog
+        TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(),
+                new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        calendar.set(Calendar.MINUTE, minute);
+                        // Convert to UTC
+                        mPickedTime = calendar.getTimeInMillis();
+                        showReasonPickerDialogForProposal();
+
+                    }
+                }, hour, minute, false);
+        timePickerDialog.show();
+    }
+
+    private void showReasonPickerDialogForProposal() {
+        ReasonPickerDialog dialog = new ReasonPickerDialog();
+        dialog.setReasonPickedListener(this);
+        dialog.setRequestId(REQUEST_PROPOSAL);
+        dialog.show(getActivity().getSupportFragmentManager(), "ReasonPickerDialog");
     }
 
     private void updateMap() {
@@ -396,27 +484,23 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Loader
 
             mAcceptInvitation.getBackground().clearColorFilter();
             mRefuseInvitation.getBackground().clearColorFilter();
+            mAcceptInvitation.setEnabled(true);
+            mRefuseInvitation.setEnabled(true);
 
             if (!mIsMyAppointment) {
                 mState = data.getString(COL_STATE);
                 switch (mState) {
                     case "pending":
-                        mAcceptInvitation.setEnabled(true);
-                        mRefuseInvitation.setEnabled(true);
                         mAcceptInvitation.setText(getString(R.string.text_accept_invitation));
                         mRefuseInvitation.setText(getString(R.string.refuse));
                         break;
                     case "refused":
-                        mAcceptInvitation.setEnabled(false);
-                        mRefuseInvitation.setEnabled(true);
                         mAcceptInvitation.setText(getString(R.string.text_accept_invitation));
                         mRefuseInvitation.setText(getString(R.string.cancel_refuse));
                         mRefuseInvitation.getBackground().setColorFilter(
                                 getResources().getColor(R.color.btnRefused), PorterDuff.Mode.SRC_ATOP);
                         break;
                     case "accepted":
-                        mAcceptInvitation.setEnabled(true);
-                        mRefuseInvitation.setEnabled(false);
                         mAcceptInvitation.setText(getString(R.string.text_cancel_accepted_invitation));
                         mRefuseInvitation.setText(getString(R.string.refuse));
                         mAcceptInvitation.getBackground().setColorFilter(

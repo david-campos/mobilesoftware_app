@@ -89,4 +89,10 @@
     <string name="req_unblock_user">unblock</string>
     <string name="query_unblock_user_phone">p</string>
     <string name="response_profile_blocked_users">blocked_users</string>
+    <string name="req_new_proposition">nprop</string>
+    <string name="query_proposition_place">p</string>
+    <string name="query_proposition_timestamp">h</string>
+    <string name="query_proposition_longitude">lo</string>
+    <string name="query_proposition_latitude">la</string>
+    <string name="query_proposition_reason">r</string>
 </resources>

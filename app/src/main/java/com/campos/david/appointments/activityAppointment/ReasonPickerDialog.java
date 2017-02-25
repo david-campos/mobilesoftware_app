@@ -23,7 +23,7 @@ import com.campos.david.appointments.model.DBContract;
 
 public class ReasonPickerDialog extends DialogFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     public interface ReasonPickerDialogListener {
-        void reasonPicked(String reasonName);
+        void reasonPicked(String reasonName, int requestId);
     }
 
     private static final int REASONS_LOADER = 0;
@@ -47,6 +47,7 @@ public class ReasonPickerDialog extends DialogFragment implements LoaderManager.
     private TextView mDescription;
     private ReasonPickerDialogListener mListener;
     private SimpleCursorAdapter mAdapter;
+    private int mRequestId = -1;
 
     public ReasonPickerDialogListener getReasonPickedListener() {
         return mListener;
@@ -54,6 +55,14 @@ public class ReasonPickerDialog extends DialogFragment implements LoaderManager.
 
     public void setReasonPickedListener(ReasonPickerDialogListener listener) {
         this.mListener = listener;
+    }
+
+    public int getRequestId() {
+        return mRequestId;
+    }
+
+    public void setRequestId(int requestId) {
+        this.mRequestId = requestId;
     }
 
     @NonNull
@@ -95,16 +104,11 @@ public class ReasonPickerDialog extends DialogFragment implements LoaderManager.
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         if (mListener != null) {
-                            mListener.reasonPicked(((Cursor) mReasons.getSelectedItem()).getString(Query.COL_NAME));
+                            mListener.reasonPicked(((Cursor) mReasons.getSelectedItem()).getString(Query.COL_NAME), mRequestId);
                         }
-                        ReasonPickerDialog.this.getDialog().dismiss();
                     }
                 })
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        ReasonPickerDialog.this.getDialog().cancel();
-                    }
-                });
+                .setNegativeButton(android.R.string.cancel, null);
         return builder.create();
     }
 

@@ -43,7 +43,6 @@
             android:theme="@style/LoginScreenTheme">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
-
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
@@ -51,14 +50,26 @@
         <activity
             android:name=".activityAppointment.AppointmentActivity"
             android:label="@string/title_activity_main"
-            android:parentActivityName=".activityMain.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:parentActivityName=".activityMain.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activityMain.MainActivity" />
         </activity>
-        <activity android:name=".AboutActivity" />
-        <activity android:name=".activityNewAppointment.NewAppointmentActivity" />
+        <activity android:name=".AboutActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activityMain.MainActivity" />
+        </activity>
+        <activity android:name=".activityNewAppointment.NewAppointmentActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activityMain.MainActivity" />
+        </activity>
+        <activity android:name=".activitySettings.SettingsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activityMain.MainActivity" />
+        </activity>
 
         <service
             android:name=".services.UpdateUsersService"
@@ -74,15 +85,12 @@
         <service
             android:name=".services.UpdateAppointmentsService"
             android:exported="false" />
-
-        <activity android:name=".activitySettings.SettingsActivity" />
-
         <service
             android:name=".services.AppointmentDiscussionService"
             android:exported="false" />
         <service
             android:name=".services.ProfileTasksService"
-            android:exported="false"></service>
+            android:exported="false" />
     </application>
 
 </manifest>

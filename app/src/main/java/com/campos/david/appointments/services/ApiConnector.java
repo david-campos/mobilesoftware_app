@@ -75,6 +75,19 @@ public class ApiConnector {
         return getObjectFromApi(cv);
     }
 
+    public JSONObject createProposal(String place, String timestamp, double longitude,
+                                     double latitude, String reasonName, int appointmentId) {
+        ContentValues cv = new ContentValues(7);
+        cv.put(mContext.getString(R.string.query_proposition_place), place);
+        cv.put(mContext.getString(R.string.query_proposition_timestamp), timestamp);
+        cv.put(mContext.getString(R.string.query_proposition_longitude), longitude);
+        cv.put(mContext.getString(R.string.query_proposition_latitude), latitude);
+        cv.put(mContext.getString(R.string.query_proposition_reason), reasonName);
+        cv.put(mContext.getString(R.string.query_appointment_id), appointmentId);
+        cv.put(mContext.getString(R.string.query_request_key), mContext.getString(R.string.req_new_proposition));
+        return getObjectFromApi(cv);
+    }
+
     /**
      * Tries to filter the list of phones to find that ones that are registered in the
      * API database.

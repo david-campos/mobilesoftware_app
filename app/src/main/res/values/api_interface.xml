@@ -95,4 +95,5 @@
     <string name="query_proposition_longitude">lo</string>
     <string name="query_proposition_latitude">la</string>
     <string name="query_proposition_reason">r</string>
+    <string name="req_get_appointment_propositions">gprop</string>
 </resources>

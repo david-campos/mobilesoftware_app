@@ -1,6 +1,7 @@
 package com.campos.david.appointments.activityAppointment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 import com.campos.david.appointments.PersonalizedRecyclerView;
 import com.campos.david.appointments.R;
 import com.campos.david.appointments.model.DBContract;
+import com.campos.david.appointments.services.AppointmentDiscussionService;
 
 /**
  * A fragment presenting a list of Suggestions.
@@ -52,6 +54,12 @@ public class SuggestionsFragment extends Fragment
         Bundle args = getArguments();
         if (args != null) {
             mAppointmentId = args.getInt(ARG_ID);
+
+            Intent intentToGetProposals = new Intent(getActivity().getApplicationContext(),
+                    AppointmentDiscussionService.class);
+            intentToGetProposals.setAction(AppointmentDiscussionService.ACTION_GET_PROPOSALS);
+            intentToGetProposals.putExtra(AppointmentDiscussionService.EXTRA_APPOINTMENT, mAppointmentId);
+            getActivity().startService(intentToGetProposals);
         }
     }
 

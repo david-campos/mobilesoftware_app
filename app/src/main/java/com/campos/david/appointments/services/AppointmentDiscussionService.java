@@ -12,6 +12,8 @@ import com.campos.david.appointments.R;
 import com.campos.david.appointments.model.AppointmentManager;
 import com.campos.david.appointments.model.DBContract;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Calendar;
@@ -25,6 +27,7 @@ public class AppointmentDiscussionService extends IntentService {
     public static final String ACTION_ACCEPT = "accept-invitation";
     public static final String ACTION_SET_PENDING = "set-pending-invitation";
     public static final String ACTION_CREATE_PROPOSAL = "new-proposal";
+    public static final String ACTION_GET_PROPOSALS = "get-proposals";
 
     public static final String EXTRA_APPOINTMENT = "appointment";
     public static final String EXTRA_REASON = "reason";
@@ -61,8 +64,11 @@ public class AppointmentDiscussionService extends IntentService {
                         }
                         json = connector.refuseInvitation(appointmentId, reason);
                     } else if (ACTION_CREATE_PROPOSAL.equals(action)) {
-                        handleCreateProposal(intent, appointmentId);
-                        return; // Answer is different is a proposal, not the complete appointment
+                        handleCreateProposal(intent, appointmentId, connector);
+                        return; // Answer is different, it's a proposal, not the complete appointment
+                    } else if (ACTION_GET_PROPOSALS.equals(action)) {
+                        handleGetProposals(appointmentId, connector);
+                        return; // Answer is different
                     }
                     // Reading answer
                     if (json != null) {
@@ -83,7 +89,8 @@ public class AppointmentDiscussionService extends IntentService {
         }
     }
 
-    private void handleCreateProposal(@NonNull Intent intent, int appointmentId) {
+    private void handleCreateProposal(@NonNull Intent intent, int appointmentId,
+                                      @NonNull ApiConnector connector) {
         String reason = intent.getStringExtra(EXTRA_REASON);
         long timestamp = intent.getLongExtra(EXTRA_TIMESTAMP, -1);
         if (reason == null || timestamp == -1) {
@@ -103,7 +110,6 @@ public class AppointmentDiscussionService extends IntentService {
                 null, null, null);
         if (cur != null) {
             if (cur.moveToFirst()) {
-                ApiConnector connector = new ApiConnector(this);
                 double lat = cur.getDouble(0);
                 double lon = cur.getDouble(1);
                 String place = cur.getString(2);
@@ -116,6 +122,23 @@ public class AppointmentDiscussionService extends IntentService {
                 }
             }
             cur.close();
+        }
+    }
+
+    private void handleGetProposals(int appointmentId, @NonNull ApiConnector connector) {
+        JSONArray answer = connector.getAppointmentPropositions(appointmentId);
+        if (answer != null) {
+            Parser parser = new Parser(this);
+            try {
+                ContentValues[] cvs = new ContentValues[answer.length()];
+                for (int i = 0; i < answer.length(); i++) {
+                    cvs[i] = parser.getPropositionFrom(answer.getJSONObject(i));
+                }
+                int inserted = getContentResolver().bulkInsert(DBContract.PropositionsEntry.CONTENT_URI, cvs);
+                Log.v(TAG, "Inserted " + inserted + " proposals");
+            } catch (JSONException e) {
+                Log.e(TAG, "Error parsing API answer", e);
+            }
         }
     }
 }

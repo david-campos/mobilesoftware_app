@@ -12,24 +12,21 @@ import com.campos.david.appointments.CursorRecyclerViewAdapter;
 import com.campos.david.appointments.R;
 import com.campos.david.appointments.model.DBContract;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Calendar;
 
 public class SuggestionsAdapter extends CursorRecyclerViewAdapter<SuggestionsAdapter.ViewHolder> {
     public static final String[] PROJECTION = {
             DBContract.PropositionsEntry.TABLE_NAME + "." + DBContract.PropositionsEntry._ID,
             DBContract.PropositionsEntry.TABLE_NAME + "." + DBContract.PropositionsEntry.COLUMN_TIMESTAMP,
             DBContract.UsersEntry.TABLE_NAME + "." + DBContract.UsersEntry.COLUMN_NAME,
-            DBContract.PropositionsEntry.TABLE_NAME + "." + DBContract.PropositionsEntry.COLUMN_PLACE_NAME,
             DBContract.ReasonsEntry.TABLE_NAME + "." + DBContract.ReasonsEntry.COLUMN_NAME,
             DBContract.ReasonsEntry.TABLE_NAME + "." + DBContract.ReasonsEntry.COLUMN_DESCRIPTION
     };
 
-    public static final int COL_TIMESTAMP = 0;
-    public static final int COL_USER = 0;
-    public static final int COL_REASON_NAME = 0;
-    public static final int COL_REASON_DESCRIPTION = 0;
-
+    public static final int COL_TIMESTAMP = 1;
+    public static final int COL_USER = 2;
+    public static final int COL_REASON_NAME = 3;
+    public static final int COL_REASON_DESCRIPTION = 4;
 
     private final OnSuggestionInteractionListener mListener;
     private final Context mContext;
@@ -49,9 +46,13 @@ public class SuggestionsAdapter extends CursorRecyclerViewAdapter<SuggestionsAda
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, Cursor cursor) {
-        String timestamp = SimpleDateFormat.getDateTimeInstance(
-                SimpleDateFormat.LONG, SimpleDateFormat.SHORT).format(
-                new Date(cursor.getLong(COL_TIMESTAMP)));
+        Calendar calendar = Calendar.getInstance();
+        // Multiply database value by 1000 bc Date constructor expects milliseconds
+        calendar.setTimeInMillis(1000 * cursor.getLong(COL_TIMESTAMP));
+        String timestamp = mContext.getString(R.string.timestamp_format,
+                calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
+                calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
+
         holder.mTitle.setText(
                 mContext.getString(R.string.text_suggestion,
                         cursor.getString(COL_USER),

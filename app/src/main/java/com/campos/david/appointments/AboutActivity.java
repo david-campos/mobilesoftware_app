@@ -121,14 +121,14 @@ public class AboutActivity extends AppCompatActivity {
         }
 
         public void onScreenClicked(float x, float y) {
-            synchronized (mCameraLock) {
+            /*synchronized (mCameraLock) {
                 float centerX = mCameraRect.width() / 2.0f;
                 float centerY = mCameraRect.height() / 2.0f;
                 mCameraDestiny = new Point(
                         Math.round(mCameraRect.left + x - centerX),
                         Math.round(mCameraRect.top + y - centerY));
                 mDoConstantDown = false;
-            }
+            }*/
         }
 
         public MyRenderer(Context context) {

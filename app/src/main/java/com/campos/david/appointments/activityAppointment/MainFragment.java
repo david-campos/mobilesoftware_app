@@ -256,7 +256,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Loader
                 new AlertDialog.Builder(getActivity())
                         .setTitle(R.string.title_suggest_change)
                         .setMessage(getString(R.string.message_suggest_change, pickedTimeStr, reasonName))
-                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setIcon(R.drawable.ic_done)
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 Intent proposalCreationIntent = new Intent(getActivity().getApplicationContext(),

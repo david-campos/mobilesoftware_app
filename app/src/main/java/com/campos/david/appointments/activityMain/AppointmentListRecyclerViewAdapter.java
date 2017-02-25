@@ -2,6 +2,7 @@ package com.campos.david.appointments.activityMain;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -31,6 +32,8 @@ public class AppointmentListRecyclerViewAdapter extends CursorRecyclerViewAdapte
 
     private static final int MAX_DISPLAY = 4;
 
+    private final int fIconSidePx;
+
     private OnListFragmentInteractionListener mListener;
     private Context mContext;
     private Map<Integer, List<String>> mAppointmentWiths = new HashMap<>();
@@ -45,6 +48,7 @@ public class AppointmentListRecyclerViewAdapter extends CursorRecyclerViewAdapte
         mWithsCursor = null;
         mWithsValid = false;
         mListener = listener;
+        fIconSidePx = (int) Math.ceil(mContext.getResources().getDimension(R.dimen.appointment_type_icon_side) * Resources.getSystem().getDisplayMetrics().density);
         SharedPreferences preferences = mContext.getSharedPreferences(mContext.getString(R.string.preferences_file_key),
                 Context.MODE_PRIVATE);
         mApiUri = mContext.getString(R.string.api_protocol) + preferences.getString(mContext.getString(R.string.api_uri_key),
@@ -137,9 +141,12 @@ public class AppointmentListRecyclerViewAdapter extends CursorRecyclerViewAdapte
 
         int iconId = cursor.getInt(AppointmentListFragment.CURSOR_TYPE_ICON_COL);
         String uri = mContext.getString(R.string.api_types_format, mApiUri, iconId);
-        Picasso.with(mContext)
-                .load(uri)
+        Picasso pic = Picasso.with(mContext);
+        pic.setIndicatorsEnabled(true);
+        pic.load(uri)
                 .placeholder(R.drawable.unknown_type)
+                .resize(fIconSidePx, fIconSidePx)
+                .noFade()
                 .into(holder.mImageView);
 
         boolean isUserAppointment = cursor.isNull(AppointmentListFragment.CURSOR_CREATOR_COL);

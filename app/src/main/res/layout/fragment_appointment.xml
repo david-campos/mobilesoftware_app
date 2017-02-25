@@ -10,8 +10,8 @@
     android:paddingEnd="4dp">
 
     <ImageView
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="@dimen/appointment_type_icon_side"
+        android:layout_height="@dimen/appointment_type_icon_side"
         android:id="@+id/iv_typeIcon"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"

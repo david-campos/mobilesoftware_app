@@ -96,4 +96,7 @@
     <string name="query_proposition_latitude">la</string>
     <string name="query_proposition_reason">r</string>
     <string name="req_get_appointment_propositions">gprop</string>
+    <string name="query_accept_proposition_place">p</string>
+    <string name="req_accept_proposition">aprop</string>
+    <string name="query_accept_proposition_timestamp">h</string>
 </resources>

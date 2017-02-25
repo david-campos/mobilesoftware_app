@@ -1,6 +1,7 @@
 package com.campos.david.appointments.activityAppointment;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -10,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +22,8 @@ import com.campos.david.appointments.PersonalizedRecyclerView;
 import com.campos.david.appointments.R;
 import com.campos.david.appointments.model.DBContract;
 import com.campos.david.appointments.services.AppointmentDiscussionService;
+
+import java.util.Calendar;
 
 /**
  * A fragment presenting a list of Suggestions.
@@ -83,7 +87,27 @@ public class SuggestionsFragment extends Fragment
     }
 
     @Override
-    public void onSuggestionInteraction(int number) {
+    public void onSuggestionInteraction(final long timestampMillis, String place) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timestampMillis);
+        String timestampStr = getString(R.string.timestamp_format,
+                calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
+                calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.title_accept_suggestion)
+                .setMessage(getString(R.string.message_accept_suggestion, timestampStr))
+                .setIcon(R.drawable.ic_done)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        Intent proposalAcceptIntent = new Intent(getActivity().getApplicationContext(),
+                                AppointmentDiscussionService.class);
+                        proposalAcceptIntent.setAction(AppointmentDiscussionService.ACTION_ACCEPT_PROPOSAL);
+                        proposalAcceptIntent.putExtra(AppointmentDiscussionService.EXTRA_APPOINTMENT, mAppointmentId);
+                        proposalAcceptIntent.putExtra(AppointmentDiscussionService.EXTRA_TIMESTAMP, timestampMillis);
+                        getActivity().startService(proposalAcceptIntent);
+                    }
+                })
+                .setNegativeButton(android.R.string.no, null).show();
     }
 
     @Override

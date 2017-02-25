@@ -17,6 +17,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Calendar;
+import java.util.TimeZone;
 
 public class AppointmentDiscussionService extends IntentService {
     private static final String TAG = AppointmentDiscussionService.class.getSimpleName();
@@ -28,6 +29,7 @@ public class AppointmentDiscussionService extends IntentService {
     public static final String ACTION_SET_PENDING = "set-pending-invitation";
     public static final String ACTION_CREATE_PROPOSAL = "new-proposal";
     public static final String ACTION_GET_PROPOSALS = "get-proposals";
+    public static final String ACTION_ACCEPT_PROPOSAL = "accept-proposal";
 
     public static final String EXTRA_APPOINTMENT = "appointment";
     public static final String EXTRA_REASON = "reason";
@@ -63,8 +65,10 @@ public class AppointmentDiscussionService extends IntentService {
                             return;
                         }
                         json = connector.refuseInvitation(appointmentId, reason);
+                    } else if (ACTION_ACCEPT_PROPOSAL.equals(action)) {
+                        json = handleCreateAcceptProposal(action, intent, appointmentId, connector);
                     } else if (ACTION_CREATE_PROPOSAL.equals(action)) {
-                        handleCreateProposal(intent, appointmentId, connector);
+                        handleCreateAcceptProposal(action, intent, appointmentId, connector);
                         return; // Answer is different, it's a proposal, not the complete appointment
                     } else if (ACTION_GET_PROPOSALS.equals(action)) {
                         handleGetProposals(appointmentId, connector);
@@ -89,18 +93,21 @@ public class AppointmentDiscussionService extends IntentService {
         }
     }
 
-    private void handleCreateProposal(@NonNull Intent intent, int appointmentId,
-                                      @NonNull ApiConnector connector) {
-        String reason = intent.getStringExtra(EXTRA_REASON);
+    private JSONObject handleCreateAcceptProposal(String action, @NonNull Intent intent, int appointmentId,
+                                                  @NonNull ApiConnector connector) {
+        // Get timestamp
         long timestamp = intent.getLongExtra(EXTRA_TIMESTAMP, -1);
-        if (reason == null || timestamp == -1) {
-            return;
+        if (timestamp == -1) {
+            return null;
         }
         Calendar c = Calendar.getInstance();
+        c.setTimeZone(TimeZone.getTimeZone("UTC"));
         c.setTimeInMillis(timestamp);
         String timestampStr = getString(R.string.api_timestamp_format,
                 c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH),
                 c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE));
+
+        // Get current proposal info
         Cursor cur = getContentResolver().query(
                 Uri.withAppendedPath(DBContract.AppointmentsEntry.CONTENT_URI, Integer.toString(appointmentId)),
                 new String[]{
@@ -109,20 +116,33 @@ public class AppointmentDiscussionService extends IntentService {
                         DBContract.PropositionsEntry.TABLE_NAME + "." + DBContract.PropositionsEntry.COLUMN_PLACE_NAME},
                 null, null, null);
         if (cur != null) {
-            if (cur.moveToFirst()) {
+            if (cur.moveToNext()) {
                 double lat = cur.getDouble(0);
                 double lon = cur.getDouble(1);
                 String place = cur.getString(2);
-                JSONObject json = connector.createProposal(place, timestampStr, lon, lat, reason,
-                        appointmentId);
-                if (json == null) {
-                    // We don't need to save it as it is not our business (only creator can
-                    // administrate them)
-                    Log.e(TAG, "Some error creatingProposal");
+                cur.close();
+
+                if (action.equals(ACTION_ACCEPT_PROPOSAL)) {
+                    return connector.acceptProposal(place, timestampStr, appointmentId);
+                } else {
+                    String reason = intent.getStringExtra(EXTRA_REASON);
+                    if (reason == null) {
+                        return null;
+                    }
+
+                    JSONObject json = connector.createProposal(place, timestampStr, lon, lat, reason,
+                            appointmentId);
+                    if (json == null) {
+                        // We don't need to save it as it is not our business (only creator can
+                        // administrate them)
+                        Log.e(TAG, "Some error creatingProposal");
+                    }
+                    return json;
                 }
             }
             cur.close();
         }
+        return null;
     }
 
     private void handleGetProposals(int appointmentId, @NonNull ApiConnector connector) {

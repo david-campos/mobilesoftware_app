@@ -20,13 +20,15 @@ public class SuggestionsAdapter extends CursorRecyclerViewAdapter<SuggestionsAda
             DBContract.PropositionsEntry.TABLE_NAME + "." + DBContract.PropositionsEntry.COLUMN_TIMESTAMP,
             DBContract.UsersEntry.TABLE_NAME + "." + DBContract.UsersEntry.COLUMN_NAME,
             DBContract.ReasonsEntry.TABLE_NAME + "." + DBContract.ReasonsEntry.COLUMN_NAME,
-            DBContract.ReasonsEntry.TABLE_NAME + "." + DBContract.ReasonsEntry.COLUMN_DESCRIPTION
+            DBContract.ReasonsEntry.TABLE_NAME + "." + DBContract.ReasonsEntry.COLUMN_DESCRIPTION,
+            DBContract.PropositionsEntry.TABLE_NAME + "." + DBContract.PropositionsEntry.COLUMN_PLACE_NAME
     };
 
-    public static final int COL_TIMESTAMP = 1;
-    public static final int COL_USER = 2;
-    public static final int COL_REASON_NAME = 3;
-    public static final int COL_REASON_DESCRIPTION = 4;
+    private static final int COL_TIMESTAMP = 1;
+    private static final int COL_USER = 2;
+    private static final int COL_REASON_NAME = 3;
+    private static final int COL_REASON_DESCRIPTION = 4;
+    private static final int COL_PLACE = 5;
 
     private final OnSuggestionInteractionListener mListener;
     private final Context mContext;
@@ -46,9 +48,11 @@ public class SuggestionsAdapter extends CursorRecyclerViewAdapter<SuggestionsAda
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, Cursor cursor) {
-        Calendar calendar = Calendar.getInstance();
         // Multiply database value by 1000 bc Date constructor expects milliseconds
-        calendar.setTimeInMillis(1000 * cursor.getLong(COL_TIMESTAMP));
+        holder.setTimestamp(1000 * cursor.getLong(COL_TIMESTAMP));
+        holder.setPlace(cursor.getString(COL_PLACE));
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(holder.getTimestamp());
         String timestamp = mContext.getString(R.string.timestamp_format,
                 calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
                 calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
@@ -67,7 +71,7 @@ public class SuggestionsAdapter extends CursorRecyclerViewAdapter<SuggestionsAda
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onSuggestionInteraction(holder.getAdapterPosition());
+                    mListener.onSuggestionInteraction(holder.getTimestamp(), holder.getPlace());
                 }
             }
         });
@@ -78,6 +82,25 @@ public class SuggestionsAdapter extends CursorRecyclerViewAdapter<SuggestionsAda
         public final TextView mTitle;
         public final TextView mReason;
 
+        private long timestamp;
+        private String place;
+
+        public long getTimestamp() {
+            return timestamp;
+        }
+
+        public void setTimestamp(long timestamp) {
+            this.timestamp = timestamp;
+        }
+
+        public String getPlace() {
+            return place;
+        }
+
+        public void setPlace(String place) {
+            this.place = place;
+        }
+
         public ViewHolder(View view) {
             super(view);
             mView = view;
@@ -87,6 +110,6 @@ public class SuggestionsAdapter extends CursorRecyclerViewAdapter<SuggestionsAda
     }
 
     public interface OnSuggestionInteractionListener {
-        void onSuggestionInteraction(int number);
+        void onSuggestionInteraction(long timestampInMillis, String place);
     }
 }

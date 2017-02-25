@@ -213,6 +213,15 @@ public class ApiConnector {
         return getArrayFromApi(cv);
     }
 
+    public JSONObject acceptProposal(@NonNull String place, @NonNull String timestamp, int appointmentId) {
+        ContentValues cv = new ContentValues(7);
+        cv.put(mContext.getString(R.string.query_accept_proposition_place), place);
+        cv.put(mContext.getString(R.string.query_accept_proposition_timestamp), timestamp);
+        cv.put(mContext.getString(R.string.query_appointment_id), appointmentId);
+        cv.put(mContext.getString(R.string.query_request_key), mContext.getString(R.string.req_accept_proposition));
+        return getObjectFromApi(cv);
+    }
+
     public JSONObject changeName(String name) {
         ContentValues cv = new ContentValues(2);
         cv.put(mContext.getString(R.string.query_profile_name), name);

@@ -466,6 +466,7 @@ public class ContentProvider extends android.content.ContentProvider {
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         db.beginTransaction();
         SQLiteStatement checkInvitation = null;
+        SQLiteStatement checkProposition = null;
         if (tableAndUri[0].equals(InvitationsEntry.TABLE_NAME)) {
             String query = "SELECT " + InvitationsEntry._ID +
                     " FROM " + tableAndUri[0] +
@@ -474,6 +475,13 @@ public class ContentProvider extends android.content.ContentProvider {
                     InvitationsEntry.COLUMN_USER + " IS NULL))" +
                     " LIMIT 1";
             checkInvitation = db.compileStatement(query);
+        } else if (tableAndUri[0].equals(PropositionsEntry.TABLE_NAME)) {
+            String query = "SELECT " + PropositionsEntry._ID +
+                    " FROM " + tableAndUri[0] +
+                    " WHERE " + PropositionsEntry.COLUMN_PLACE_NAME + "=? AND " +
+                    PropositionsEntry.COLUMN_TIMESTAMP + "=?" +
+                    " LIMIT 1";
+            checkProposition = db.compileStatement(query);
         }
         try {
             for (ContentValues cv : values) {
@@ -503,6 +511,25 @@ public class ContentProvider extends android.content.ContentProvider {
                         continue;
                     }
                 }
+
+                if (checkProposition != null) {
+                    long id;
+                    checkProposition.clearBindings();
+                    checkProposition.bindString(1, cv.getAsString(PropositionsEntry.COLUMN_PLACE_NAME));
+                    checkProposition.bindLong(2, cv.getAsLong(PropositionsEntry.COLUMN_TIMESTAMP));
+                    try {
+                        id = checkProposition.simpleQueryForLong();
+                    } catch (SQLiteDoneException e) {
+                        id = -1;
+                    }
+
+                    if (id != -1) {
+                        db.update(tableAndUri[0], cv,
+                                PropositionsEntry._ID + "=?", new String[]{Long.toString(id)});
+                        continue;
+                    }
+                }
+
                 long newID = db.insertWithOnConflict(tableAndUri[0], null, cv, SQLiteDatabase.CONFLICT_REPLACE);
                 if (newID <= 0) {
                     throw new SQLException("Failed to insert row into " + uri);

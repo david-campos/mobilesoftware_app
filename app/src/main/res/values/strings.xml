@@ -122,4 +122,6 @@
     <string name="pref_username_dialog_title">Username</string>
     <string name="title_suggest_change">Suggest change</string>
     <string name="message_suggest_change">Do you really want to do the following suggestion?\n%1$s\nReason: %2$s</string>
+    <string name="title_accept_suggestion">Accept suggestion</string>
+    <string name="message_accept_suggestion">Do you want to set the appointment time to \'%1$s\'?</string>
 </resources>

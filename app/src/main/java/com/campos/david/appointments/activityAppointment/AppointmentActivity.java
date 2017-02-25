@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 
 import com.campos.david.appointments.R;
 
@@ -55,12 +56,11 @@ public class AppointmentActivity extends AppCompatActivity {
             // primary sections of the activity.
             mSectionsPagerAdapter = new AppointmentPagerAdapter(id, userIsCreator, appointmentClosed, getSupportFragmentManager());
 
-            // Set up the ViewPager with the sections adapter.
+            // Set up the ViewPager with the sections adapter is done in onResume
             mViewPager = (ViewPager) findViewById(R.id.container);
-            if (mViewPager != null) {
-                mViewPager.setAdapter(mSectionsPagerAdapter);
-                mViewPager.setCurrentItem(1);
-            }
+            mViewPager.setAdapter(mSectionsPagerAdapter);
+            mViewPager.setCurrentItem(1);
+            mViewPager.setVisibility(View.VISIBLE);
         } else {
             Snackbar.make(this.findViewById(android.R.id.content), R.string.something_wrong,
                     Snackbar.LENGTH_INDEFINITE);

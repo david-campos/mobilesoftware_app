@@ -323,7 +323,7 @@ public class ApiConnector {
         HttpURLConnection urlConnection = null;
         try {
             Uri connectionUri = buildConnectionUri(params);
-            Log.d(TAG, "Connecting to: " + connectionUri);
+            Log.v(TAG, "Connecting to: " + connectionUri);
             urlConnection = connect(connectionUri);
             String jsonStr = readInputStream(urlConnection);
             JSONObject response = new JSONObject(jsonStr);

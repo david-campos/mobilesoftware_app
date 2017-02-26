@@ -30,7 +30,7 @@ public class UserManager {
 
     public void insertUsers(ContentValues users[]) {
         int inserted = mContext.getContentResolver().bulkInsert(DBContract.UsersEntry.CONTENT_URI, users);
-        Log.d(mContext.getClass().getSimpleName(), "Inserted " + inserted + " users.");
+        Log.v(mContext.getClass().getSimpleName(), "Inserted " + inserted + " users.");
     }
 
     @SuppressLint("CommitPrefEdits")

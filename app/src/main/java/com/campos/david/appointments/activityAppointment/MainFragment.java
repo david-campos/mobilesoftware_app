@@ -17,7 +17,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -259,8 +258,6 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Loader
         int month = c.get(Calendar.MONTH);
         int day = c.get(Calendar.DAY_OF_MONTH);
 
-        Log.d(TAG, "Showing DatePickerDialog");
-
         DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
                 new DatePickerDialog.OnDateSetListener() {
                     @Override
@@ -466,7 +463,9 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Loader
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mCurrentCursor = data;
 
-        if (data.moveToFirst()) {
+        if (data.moveToFirst() &&
+                !(data.isNull(COL_PLACE) || data.isNull(COL_DESCRIPTION) ||
+                        data.isNull(COL_TIMESTAMP) || data.isNull(COL_CLOSED))) {
             String place = data.getString(COL_PLACE);
             String description = data.getString(COL_DESCRIPTION);
             long timestampLong = data.getLong(COL_TIMESTAMP);

@@ -35,7 +35,7 @@ public class UpdateTypesAndReasonsService extends IntentService {
                 int inserted = ctx.getContentResolver().bulkInsert(
                         DBContract.AppointmentTypesEntry.CONTENT_URI,
                         typesAndReasons.first);
-                Log.d(ctx.getClass().getSimpleName(), "Inserted " + inserted + " types of appointments.");
+                Log.v(ctx.getClass().getSimpleName(), "Inserted " + inserted + " types of appointments.");
             } else {
                 throw new NullPointerException("Types is null");
             }
@@ -43,7 +43,7 @@ public class UpdateTypesAndReasonsService extends IntentService {
                 int inserted = ctx.getContentResolver().bulkInsert(
                         DBContract.ReasonsEntry.CONTENT_URI,
                         typesAndReasons.second);
-                Log.d(ctx.getClass().getSimpleName(), "Inserted " + inserted + " reasons.");
+                Log.v(ctx.getClass().getSimpleName(), "Inserted " + inserted + " reasons.");
             } else {
                 throw new NullPointerException("Reasons is null");
             }

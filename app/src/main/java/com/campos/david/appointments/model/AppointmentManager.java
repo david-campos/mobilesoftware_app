@@ -27,7 +27,7 @@ public class AppointmentManager {
             insertAsCurrentProposal(currentProposal);
         }
         int invN = mContext.getContentResolver().bulkInsert(DBContract.InvitationsEntry.CONTENT_URI, invitations);
-        Log.d(TAG, "Inserted " + appN + " appointments (" + invN + " invitations)");
+        Log.v(TAG, "Inserted " + appN + " appointments (" + invN + " invitations)");
     }
 
     public void appointmentInsertion(ContentValues appointment, ContentValues[] invitations,

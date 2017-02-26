@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,7 +64,6 @@ public class AppointmentListRecyclerViewAdapter extends CursorRecyclerViewAdapte
             loadAppointmentWiths();
             mWithsValid = true;
             notifyDataSetChanged();
-            Log.d(TAG, "DataSetChanged notified");
         } else {
             mWithsValid = false;
             notifyDataSetChanged();

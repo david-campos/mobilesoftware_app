@@ -159,7 +159,6 @@ public class AppointmentDiscussionService extends IntentService {
                                         DBContract.PropositionsEntry.CONTENT_URI, cv,
                                         DBContract.PropositionsEntry._ID + "=?",
                                         new String[]{cursor.getString(0)});
-                                Log.d(TAG, "Proposition updated");
                             } else {
                                 // If it doesn't exist we are interested only if it is our appointment,
                                 // because only if the appointment is ours a list of all the propositions

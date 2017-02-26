@@ -2,6 +2,7 @@ package com.campos.david.appointments.model;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
@@ -38,6 +39,7 @@ public class AppointmentManager {
 
     private void insertAsCurrentProposal(ContentValues proposal) {
         if (proposal != null) {
+            String appointmentId = proposal.getAsString(DBContract.PropositionsEntry.COLUMN_APPOINTMENT);
             Uri insertedProposal = mContext.getContentResolver().insert(DBContract.PropositionsEntry.CONTENT_URI,
                     proposal);
             if (insertedProposal != null) {
@@ -46,13 +48,32 @@ public class AppointmentManager {
                     Log.e(TAG, "Inserted proposition id (" + insertedProposal.getLastPathSegment() +
                             ") couldn't be parsed from uri " + insertedProposal);
                 }
+
+                // Delete the old proposition
+                Cursor c = mContext.getContentResolver().query(
+                        DBContract.AppointmentsEntry.CONTENT_URI,
+                        new String[]{DBContract.AppointmentsEntry.COLUMN_CURRENT_PROPOSAL},
+                        DBContract.AppointmentsEntry._ID + "=?", new String[]{appointmentId},
+                        null);
+                if (c == null) {
+                    return;
+                }
+                if (!c.moveToFirst()) {
+                    c.close();
+                    return;
+                }
+                String oldOneId = c.getString(0);
+                c.close();
+                mContext.getContentResolver().delete(DBContract.PropositionsEntry.CONTENT_URI,
+                        DBContract.PropositionsEntry._ID + "=?", new String[]{oldOneId});
+
                 // The proposition is the current one for the appointment
                 ContentValues currentProposalCv = new ContentValues(1);
                 currentProposalCv.put(DBContract.AppointmentsEntry.COLUMN_CURRENT_PROPOSAL, propositionId);
                 mContext.getContentResolver().update(
                         DBContract.AppointmentsEntry.CONTENT_URI, currentProposalCv,
                         DBContract.AppointmentsEntry._ID + "=?",
-                        new String[]{proposal.getAsString(DBContract.PropositionsEntry.COLUMN_APPOINTMENT)});
+                        new String[]{appointmentId});
             }
         }
     }

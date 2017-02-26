@@ -82,7 +82,9 @@ public class ApiConnector {
         cv.put(mContext.getString(R.string.query_proposition_timestamp), timestamp);
         cv.put(mContext.getString(R.string.query_proposition_longitude), longitude);
         cv.put(mContext.getString(R.string.query_proposition_latitude), latitude);
-        cv.put(mContext.getString(R.string.query_proposition_reason), reasonName);
+        if (reasonName != null) {
+            cv.put(mContext.getString(R.string.query_proposition_reason), reasonName);
+        }
         cv.put(mContext.getString(R.string.query_appointment_id), appointmentId);
         cv.put(mContext.getString(R.string.query_request_key), mContext.getString(R.string.req_new_proposition));
         return getObjectFromApi(cv);

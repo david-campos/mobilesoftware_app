@@ -154,11 +154,16 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Loader
             mRefuseInvitation.setEnabled(false);
             mCloseDiscussion.setEnabled(false);
 
+            mSuggestChange.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showDatePickerDialog();
+                }
+            });
+
             if (mIsMyAppointment) {
                 mAcceptInvitation.setVisibility(View.GONE);
                 mRefuseInvitation.setVisibility(View.GONE);
-                mSuggestChange.setVisibility(View.GONE);
-
                 mCloseDiscussion.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -171,12 +176,6 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Loader
                     @Override
                     public void onClick(View v) {
                         toggleAccepted();
-                    }
-                });
-                mSuggestChange.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        showDatePickerDialog();
                     }
                 });
                 mRefuseInvitation.setOnClickListener(new View.OnClickListener() {
@@ -242,33 +241,13 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Loader
     }
 
     @Override
-    public void reasonPicked(final String reasonName, final int requestId) {
+    public void reasonPicked(String reasonName, final int requestId) {
         switch (requestId) {
             case REQUEST_REFUSE:
                 throwAppointmentDiscussionService(AppointmentDiscussionService.ACTION_REFUSE, reasonName);
                 break;
             case REQUEST_PROPOSAL:
-                Calendar c = Calendar.getInstance();
-                c.setTimeInMillis(mPickedTime);
-                String pickedTimeStr = getString(R.string.timestamp_format,
-                        c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH),
-                        c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE));
-                new AlertDialog.Builder(getActivity())
-                        .setTitle(R.string.title_suggest_change)
-                        .setMessage(getString(R.string.message_suggest_change, pickedTimeStr, reasonName))
-                        .setIcon(R.drawable.ic_done)
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                Intent proposalCreationIntent = new Intent(getActivity().getApplicationContext(),
-                                        AppointmentDiscussionService.class);
-                                proposalCreationIntent.setAction(AppointmentDiscussionService.ACTION_CREATE_PROPOSAL);
-                                proposalCreationIntent.putExtra(AppointmentDiscussionService.EXTRA_APPOINTMENT, mAppointmentId);
-                                proposalCreationIntent.putExtra(AppointmentDiscussionService.EXTRA_REASON, reasonName);
-                                proposalCreationIntent.putExtra(AppointmentDiscussionService.EXTRA_TIMESTAMP, mPickedTime);
-                                getActivity().startService(proposalCreationIntent);
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, null).show();
+                confirmProposalCreation(reasonName);
                 break;
         }
     }
@@ -320,10 +299,47 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Loader
     }
 
     private void showReasonPickerDialogForProposal() {
-        ReasonPickerDialog dialog = new ReasonPickerDialog();
-        dialog.setReasonPickedListener(this);
-        dialog.setRequestId(REQUEST_PROPOSAL);
-        dialog.show(getActivity().getSupportFragmentManager(), "ReasonPickerDialog");
+        if (!mIsMyAppointment) {
+            ReasonPickerDialog dialog = new ReasonPickerDialog();
+            dialog.setReasonPickedListener(this);
+            dialog.setRequestId(REQUEST_PROPOSAL);
+            dialog.show(getActivity().getSupportFragmentManager(), "ReasonPickerDialog");
+        } else {
+            // If it is my appointment we can stop here
+            confirmProposalCreation(null);
+        }
+    }
+
+    private void confirmProposalCreation(final String reasonName) {
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(mPickedTime);
+        String pickedTimeStr = getString(R.string.timestamp_format,
+                c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH),
+                c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE));
+
+        String message;
+        if (reasonName != null) {
+            message = getString(R.string.message_suggest_change, pickedTimeStr, reasonName);
+        } else {
+            message = getString(R.string.message_accept_suggestion, pickedTimeStr);
+        }
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.title_change_time)
+                .setMessage(message)
+                .setIcon(R.drawable.ic_done)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        Intent proposalCreationIntent = new Intent(getActivity().getApplicationContext(),
+                                AppointmentDiscussionService.class);
+                        proposalCreationIntent.setAction(AppointmentDiscussionService.ACTION_CREATE_PROPOSAL);
+                        proposalCreationIntent.putExtra(AppointmentDiscussionService.EXTRA_APPOINTMENT, mAppointmentId);
+                        proposalCreationIntent.putExtra(AppointmentDiscussionService.EXTRA_REASON, reasonName);
+                        proposalCreationIntent.putExtra(AppointmentDiscussionService.EXTRA_TIMESTAMP, mPickedTime);
+                        getActivity().startService(proposalCreationIntent);
+                    }
+                })
+                .setNegativeButton(android.R.string.no, null).show();
     }
 
     private void updateMap() {

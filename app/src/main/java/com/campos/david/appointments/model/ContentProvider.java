@@ -69,8 +69,8 @@ public class ContentProvider extends android.content.ContentProvider {
     static final int USERS_ITEM = 201;
     static final int USERS_INVITED = 210;
     static final int USERS_WITH = 220;
-    static final int PROPOSITIONS = 300;
-    static final int PROPOSITIONS_INSERTION_OR_DELETE = 310;
+    static final int PROPOSITIONS_FOR_APPOINTMENT = 300;
+    static final int PROPOSITIONS = 310;
     static final int REASONS = 400;
     static final int APPOINTMENT_TYPES = 500;
     static final int INVITATIONS = 600;
@@ -92,8 +92,8 @@ public class ContentProvider extends android.content.ContentProvider {
         nUM.addURI(DBContract.CONTENT_AUTHORITY, DBContract.PATH_USERS + "/invited_to/#", USERS_INVITED);
         nUM.addURI(DBContract.CONTENT_AUTHORITY, DBContract.PATH_USERS + "/with", USERS_WITH);
 
-        nUM.addURI(DBContract.CONTENT_AUTHORITY, DBContract.PATH_PROPOSITIONS + "/#", PROPOSITIONS);
-        nUM.addURI(DBContract.CONTENT_AUTHORITY, DBContract.PATH_PROPOSITIONS, PROPOSITIONS_INSERTION_OR_DELETE);
+        nUM.addURI(DBContract.CONTENT_AUTHORITY, DBContract.PATH_PROPOSITIONS + "/#", PROPOSITIONS_FOR_APPOINTMENT);
+        nUM.addURI(DBContract.CONTENT_AUTHORITY, DBContract.PATH_PROPOSITIONS, PROPOSITIONS);
 
         nUM.addURI(DBContract.CONTENT_AUTHORITY, DBContract.PATH_REASONS, REASONS);
 
@@ -286,7 +286,7 @@ public class ContentProvider extends android.content.ContentProvider {
                     cursor.setNotificationUri(ctx.getContentResolver(), uri);
                 }
                 return cursor; // Doesn't get to the end!
-            case PROPOSITIONS:
+            case PROPOSITIONS_FOR_APPOINTMENT:
                 tableName = "(" + PropositionsEntry.TABLE_NAME + " JOIN " + UsersEntry.TABLE_NAME +
                         " ON (" +
                         PropositionsEntry.TABLE_NAME + "." + PropositionsEntry.COLUMN_CREATOR +
@@ -308,6 +308,15 @@ public class ContentProvider extends android.content.ContentProvider {
                 } else {
                     selectionArgs = new String[]{uri.getLastPathSegment()};
                 }
+                break;
+            case PROPOSITIONS:
+                tableName = "(" + PropositionsEntry.TABLE_NAME + " LEFT JOIN " + UsersEntry.TABLE_NAME +
+                        " ON (" +
+                        PropositionsEntry.TABLE_NAME + "." + PropositionsEntry.COLUMN_CREATOR +
+                        " = " + UsersEntry.TABLE_NAME + "." + UsersEntry._ID + ")" +
+                        ") LEFT JOIN " + ReasonsEntry.TABLE_NAME + " ON (" +
+                        ReasonsEntry.TABLE_NAME + "." + ReasonsEntry._ID + "=" +
+                        PropositionsEntry.TABLE_NAME + "." + PropositionsEntry.COLUMN_REASON + ")";
                 break;
             case REASONS:
                 tableName = ReasonsEntry.TABLE_NAME;
@@ -357,8 +366,8 @@ public class ContentProvider extends android.content.ContentProvider {
                 return UsersEntry.CONTENT_WITH_TYPE;
             case USERS_ITEM:
                 return UsersEntry.CONTENT_ITEM_TYPE;
+            case PROPOSITIONS_FOR_APPOINTMENT:
             case PROPOSITIONS:
-            case PROPOSITIONS_INSERTION_OR_DELETE:
                 return PropositionsEntry.CONTENT_TYPE;
             case REASONS:
                 return ReasonsEntry.CONTENT_TYPE;
@@ -382,7 +391,7 @@ public class ContentProvider extends android.content.ContentProvider {
                 table = UsersEntry.TABLE_NAME;
                 returnUri = UsersEntry.CONTENT_URI.toString();
                 break;
-            case PROPOSITIONS_INSERTION_OR_DELETE:
+            case PROPOSITIONS:
                 table = PropositionsEntry.TABLE_NAME;
                 returnUri = PropositionsEntry.CONTENT_URI.toString();
                 break;
@@ -415,7 +424,7 @@ public class ContentProvider extends android.content.ContentProvider {
             case USERS_ITEM:
                 list.add(UsersEntry.CONTENT_URI);
                 break;
-            case PROPOSITIONS:
+            case PROPOSITIONS_FOR_APPOINTMENT:
                 list.add(PropositionsEntry.CONTENT_URI);
                 break;
             case REASONS:
@@ -478,8 +487,9 @@ public class ContentProvider extends android.content.ContentProvider {
         } else if (tableAndUri[0].equals(PropositionsEntry.TABLE_NAME)) {
             String query = "SELECT " + PropositionsEntry._ID +
                     " FROM " + tableAndUri[0] +
-                    " WHERE " + PropositionsEntry.COLUMN_PLACE_NAME + "=? AND " +
-                    PropositionsEntry.COLUMN_TIMESTAMP + "=?" +
+                    " WHERE (" + PropositionsEntry.COLUMN_CREATOR + "=? OR " +
+                    "(? IS NULL AND " + PropositionsEntry.COLUMN_CREATOR + " IS NULL)) AND " +
+                    PropositionsEntry.COLUMN_APPOINTMENT + "=?" +
                     " LIMIT 1";
             checkProposition = db.compileStatement(query);
         }
@@ -515,8 +525,16 @@ public class ContentProvider extends android.content.ContentProvider {
                 if (checkProposition != null) {
                     long id;
                     checkProposition.clearBindings();
-                    checkProposition.bindString(1, cv.getAsString(PropositionsEntry.COLUMN_PLACE_NAME));
-                    checkProposition.bindLong(2, cv.getAsLong(PropositionsEntry.COLUMN_TIMESTAMP));
+                    // Only one proposition per person in each appointment
+                    String creator = cv.getAsString(PropositionsEntry.COLUMN_CREATOR);
+                    if (creator != null) {
+                        checkProposition.bindString(1, creator);
+                        checkProposition.bindString(2, creator);
+                    } else {
+                        checkProposition.bindNull(1);
+                        checkProposition.bindNull(2);
+                    }
+                    checkProposition.bindLong(3, cv.getAsLong(PropositionsEntry.COLUMN_APPOINTMENT));
                     try {
                         id = checkProposition.simpleQueryForLong();
                     } catch (SQLiteDoneException e) {
@@ -524,8 +542,8 @@ public class ContentProvider extends android.content.ContentProvider {
                     }
 
                     if (id != -1) {
-                        db.update(tableAndUri[0], cv,
-                                PropositionsEntry._ID + "=?", new String[]{Long.toString(id)});
+                        db.updateWithOnConflict(tableAndUri[0], cv,
+                                PropositionsEntry._ID + "=?", new String[]{Long.toString(id)}, SQLiteDatabase.CONFLICT_IGNORE);
                         continue;
                     }
                 }
@@ -573,7 +591,7 @@ public class ContentProvider extends android.content.ContentProvider {
                 selection = UsersEntry._ID + " = ?";
                 selectionArgs = new String[]{uri.getLastPathSegment()};
                 break;
-            case PROPOSITIONS:
+            case PROPOSITIONS_FOR_APPOINTMENT:
                 table = PropositionsEntry.TABLE_NAME;
                 selection = selection!=null?
                         String.format("( %s ) AND %s",
@@ -598,7 +616,7 @@ public class ContentProvider extends android.content.ContentProvider {
             case INVITATIONS:
                 table = InvitationsEntry.TABLE_NAME;
                 break;
-            case PROPOSITIONS_INSERTION_OR_DELETE:
+            case PROPOSITIONS:
                 table = PropositionsEntry.TABLE_NAME;
                 break;
             case SESSION_RELATED_DATA:
@@ -643,7 +661,7 @@ public class ContentProvider extends android.content.ContentProvider {
                 selection = UsersEntry._ID + "=?";
                 selectionArgs = new String[]{uri.getLastPathSegment()};
                 break;
-            case PROPOSITIONS:
+            case PROPOSITIONS_FOR_APPOINTMENT:
                 table = PropositionsEntry.TABLE_NAME;
                 selection = selection!=null?
                         String.format("( %s ) AND %s",

@@ -126,18 +126,55 @@ public class AppointmentDiscussionService extends IntentService {
                     return connector.acceptProposal(place, timestampStr, appointmentId);
                 } else {
                     String reason = intent.getStringExtra(EXTRA_REASON);
-                    if (reason == null) {
-                        return null;
-                    }
-
                     JSONObject json = connector.createProposal(place, timestampStr, lon, lat, reason,
                             appointmentId);
-                    if (json == null) {
-                        // We don't need to save it as it is not our business (only creator can
-                        // administrate them)
+                    if (json != null) {
+                        Parser parser = new Parser(this);
+                        ContentValues cv = parser.getPropositionFrom(json);
+                        String creatorId = cv.getAsString(DBContract.PropositionsEntry.COLUMN_CREATOR);
+                        // Check if it exists one from the same creator for the same appointment
+                        String where;
+                        String[] args;
+                        if (creatorId != null) {
+                            where = DBContract.PropositionsEntry.TABLE_NAME + "." +
+                                    DBContract.PropositionsEntry.COLUMN_CREATOR + "=? AND " +
+                                    DBContract.PropositionsEntry.TABLE_NAME + "." +
+                                    DBContract.PropositionsEntry.COLUMN_APPOINTMENT + "=?";
+                            args = new String[]{creatorId, Integer.toString(appointmentId)};
+                        } else {
+                            where = DBContract.PropositionsEntry.TABLE_NAME + "." +
+                                    DBContract.PropositionsEntry.COLUMN_CREATOR + " IS NULL AND " +
+                                    DBContract.PropositionsEntry.TABLE_NAME + "." +
+                                    DBContract.PropositionsEntry.COLUMN_APPOINTMENT + "=?";
+                            args = new String[]{Integer.toString(appointmentId)};
+                        }
+                        Cursor cursor = getContentResolver().query(
+                                DBContract.PropositionsEntry.CONTENT_URI,
+                                new String[]{DBContract.PropositionsEntry.TABLE_NAME + "." + DBContract.PropositionsEntry._ID},
+                                where, args, null);
+                        if (cursor != null) {
+                            if (cursor.moveToFirst()) {
+                                // If it exists it might be the current one, better exchange it.
+                                getContentResolver().update(
+                                        DBContract.PropositionsEntry.CONTENT_URI, cv,
+                                        DBContract.PropositionsEntry._ID + "=?",
+                                        new String[]{cursor.getString(0)});
+                                Log.d(TAG, "Proposition updated");
+                            } else {
+                                // If it doesn't exist we are interested only if it is our appointment,
+                                // because only if the appointment is ours a list of all the propositions
+                                // will be shown. If the appointment is not ours, we just need to have
+                                // the current proposal.
+                                if (creatorId == null) {
+                                    getContentResolver().insert(DBContract.PropositionsEntry.CONTENT_URI, cv);
+                                }
+                            }
+                            cursor.close();
+                        }
+                    } else {
                         Log.e(TAG, "Some error creatingProposal");
                     }
-                    return json;
+                    return json; // Will be ignored, but just in case
                 }
             }
             cur.close();

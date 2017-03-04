@@ -2,6 +2,7 @@ package com.campos.david.appointments.activityMain;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -20,7 +21,11 @@ import com.campos.david.appointments.services.UpdateAppointmentsService;
 import com.campos.david.appointments.services.UpdateUsersService;
 
 public class MainActivity extends AppCompatActivity {
-    private static String TAG = MainActivity.class.getSimpleName();
+    private final static String TAG = MainActivity.class.getSimpleName();
+    private final static long APPOINTMENT_UPDATE_INTERVAL = 15000; // milliseconds
+
+    private Handler mHandler = null;
+    private Runnable mUpdateAppointmentsRunnable = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,9 +38,6 @@ public class MainActivity extends AppCompatActivity {
         FloatingActionButton fabNewAppointment =
                 (FloatingActionButton) findViewById(R.id.fab_newAppointment);
 
-        // Update appointments
-        Intent throwingService = new Intent(getApplicationContext(), UpdateAppointmentsService.class);
-        startService(throwingService);
         // Update users
         Intent throwingUsersUpdate = new Intent(getApplicationContext(), UpdateUsersService.class);
         startService(throwingUsersUpdate);
@@ -57,6 +59,36 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(newAppointment);
                 }
             });
+        }
+
+        mUpdateAppointmentsRunnable = new Runnable() {
+            @Override
+            public void run() {
+                // Update appointments
+                Intent throwingService = new Intent(getApplicationContext(), UpdateAppointmentsService.class);
+                startService(throwingService);
+                if (mHandler != null) {
+                    mHandler.postDelayed(this, APPOINTMENT_UPDATE_INTERVAL);
+                }
+            }
+        };
+        mHandler = new Handler();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Update appointments each certain time
+        if (mHandler != null && mUpdateAppointmentsRunnable != null) {
+            mHandler.post(mUpdateAppointmentsRunnable);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mHandler != null && mUpdateAppointmentsRunnable != null) {
+            mHandler.removeCallbacks(mUpdateAppointmentsRunnable);
         }
     }
 

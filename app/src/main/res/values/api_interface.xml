@@ -99,4 +99,5 @@
     <string name="query_accept_proposition_place">p</string>
     <string name="req_accept_proposition">aprop</string>
     <string name="query_accept_proposition_timestamp">h</string>
+    <string name="query_get_appointments_last_update">l</string>
 </resources>

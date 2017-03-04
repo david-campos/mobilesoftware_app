@@ -248,6 +248,11 @@ public class ApiConnector {
     public JSONObject[] getAppointments() {
         ContentValues cv = new ContentValues();
         cv.put(mContext.getString(R.string.query_request_key), mContext.getString(R.string.req_get_appointments));
+        String lastUpdate = mSessionPreferences.getString(
+                mContext.getString(R.string.session_appointments_last_update), null);
+        if (lastUpdate != null) {
+            cv.put(mContext.getString(R.string.query_get_appointments_last_update), lastUpdate);
+        }
         JSONArray appointmentsJsonArray = getArrayFromApi(cv);
         JSONObject[] appointments = new JSONObject[appointmentsJsonArray.length()];
         for (int i = 0; i < appointmentsJsonArray.length(); i++) {

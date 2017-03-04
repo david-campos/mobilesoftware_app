@@ -1,6 +1,13 @@
 package com.campos.david.appointments.activityMain;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -22,10 +29,14 @@ import com.campos.david.appointments.services.UpdateUsersService;
 
 public class MainActivity extends AppCompatActivity {
     private final static String TAG = MainActivity.class.getSimpleName();
-    private final static long APPOINTMENT_UPDATE_INTERVAL = 15000; // milliseconds
+    private final static long APPOINTMENT_UPDATE_INTERVAL_MOBILE = 20000; // milliseconds
+    private final static long APPOINTMENT_UPDATE_INTERVAL_WIFI = 7500; // milliseconds
 
     private Handler mHandler = null;
     private Runnable mUpdateAppointmentsRunnable = null;
+    private boolean mOnWifi = false;
+
+    private BroadcastReceiver mNetworkReceiver = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +72,51 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
+        mNetworkReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                mOnWifi = false;
+                ConnectivityManager connMgr = (ConnectivityManager)
+                        getSystemService(CONNECTIVITY_SERVICE);
+                if (connMgr != null) {
+                    boolean connected = false;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        Network[] networks = connMgr.getAllNetworks();
+                        NetworkInfo networkInfo;
+                        for (Network mNetwork : networks) {
+                            networkInfo = connMgr.getNetworkInfo(mNetwork);
+                            if (networkInfo.getState().equals(NetworkInfo.State.CONNECTED)) {
+                                connected = true;
+                                if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+                                    mOnWifi = true;
+                                    break;
+                                }
+                            }
+                        }
+                    } else {
+                        //noinspection deprecation
+                        NetworkInfo info = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                        if (info != null) {
+                            if (info.getState() == NetworkInfo.State.CONNECTED) {
+                                connected = true;
+                                if (info.getType() == ConnectivityManager.TYPE_WIFI) {
+                                    mOnWifi = true;
+                                }
+                            }
+                        }
+                    }
+
+                    if (mHandler != null && mUpdateAppointmentsRunnable != null) {
+                        // Stop updating appointments each certain time
+                        mHandler.removeCallbacks(mUpdateAppointmentsRunnable);
+                        if (connected) {
+                            // Update appointments each certain time again
+                            mHandler.post(mUpdateAppointmentsRunnable);
+                        }
+                    }
+                }
+            }
+        };
         mUpdateAppointmentsRunnable = new Runnable() {
             @Override
             public void run() {
@@ -68,7 +124,8 @@ public class MainActivity extends AppCompatActivity {
                 Intent throwingService = new Intent(getApplicationContext(), UpdateAppointmentsService.class);
                 startService(throwingService);
                 if (mHandler != null) {
-                    mHandler.postDelayed(this, APPOINTMENT_UPDATE_INTERVAL);
+                    mHandler.postDelayed(this, mOnWifi ?
+                            APPOINTMENT_UPDATE_INTERVAL_WIFI : APPOINTMENT_UPDATE_INTERVAL_MOBILE);
                 }
             }
         };
@@ -78,15 +135,20 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Update appointments each certain time
-        if (mHandler != null && mUpdateAppointmentsRunnable != null) {
-            mHandler.post(mUpdateAppointmentsRunnable);
+        if (mNetworkReceiver != null) {
+            // Update network info please (and start appointments update)
+            mNetworkReceiver.onReceive(this, null);
+            // Register receiver
+            registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        if (mNetworkReceiver != null) {
+            unregisterReceiver(mNetworkReceiver);
+        }
         if (mHandler != null && mUpdateAppointmentsRunnable != null) {
             mHandler.removeCallbacks(mUpdateAppointmentsRunnable);
         }

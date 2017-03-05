@@ -106,12 +106,37 @@ public class AppointmentListRecyclerViewAdapter extends CursorRecyclerViewAdapte
         holder.mTitleView.setText(cursor.getString(AppointmentListFragment.CURSOR_NAME_COL));
 
         String place = cursor.getString(AppointmentListFragment.CURSOR_PLACE_COL);
-        Calendar calendar = Calendar.getInstance();
+
+        long timestampInSeconds = cursor.getLong(AppointmentListFragment.CURSOR_TIMESTAMP_COL);
+        Calendar nowCalendar = Calendar.getInstance();
+        long distanceInSeconds = timestampInSeconds - (nowCalendar.getTimeInMillis() / 1000);
+        if (distanceInSeconds < 0) {
+            // Passed
+            holder.mTitleView.setTextColor(mContext.getResources().getColor(R.color.colorPrimary));
+        } else {
+            // Coming
+            holder.mTitleView.setTextColor(mContext.getResources().getColor(R.color.textColorPrimary));
+        }
+        Calendar appointmentCalendar = Calendar.getInstance();
         // Multiply database value by 1000 bc Date constructor expects milliseconds
-        calendar.setTimeInMillis(1000 * cursor.getLong(AppointmentListFragment.CURSOR_TIMESTAMP_COL));
-        String date = mContext.getString(R.string.timestamp_format,
-                calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH),
-                calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
+        appointmentCalendar.setTimeInMillis(1000 * timestampInSeconds);
+        String realDate = mContext.getString(R.string.timestamp_format,
+                appointmentCalendar.get(Calendar.YEAR), appointmentCalendar.get(Calendar.MONTH) + 1, appointmentCalendar.get(Calendar.DAY_OF_MONTH),
+                appointmentCalendar.get(Calendar.HOUR_OF_DAY), appointmentCalendar.get(Calendar.MINUTE));
+
+        String date;
+        if (nowCalendar.get(Calendar.YEAR) == appointmentCalendar.get(Calendar.YEAR)) {
+            int dayDifference = appointmentCalendar.get(Calendar.DAY_OF_YEAR) - nowCalendar.get(Calendar.DAY_OF_YEAR);
+            if (dayDifference == 1) {
+                date = mContext.getString(R.string.tomorrow);
+            } else if (dayDifference == -1) {
+                date = mContext.getString(R.string.yesterday);
+            } else {
+                date = realDate;
+            }
+        } else {
+            date = realDate;
+        }
         holder.mProposalInfoView.setText(
                 mContext.getString(R.string.format_place_and_data, place, date));
 
@@ -142,9 +167,9 @@ public class AppointmentListRecyclerViewAdapter extends CursorRecyclerViewAdapte
         Picasso pic = Picasso.with(mContext);
 //        pic.setIndicatorsEnabled(true);
         pic.load(uri)
+                .noFade()
                 .placeholder(R.drawable.unknown_type)
                 .resize(fIconSidePx, fIconSidePx)
-                .noFade()
                 .into(holder.mImageView);
 
         boolean isUserAppointment = cursor.isNull(AppointmentListFragment.CURSOR_CREATOR_COL);

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -44,6 +45,11 @@ public class AppointmentListFragment extends Fragment implements LoaderManager.L
             DBContract.AppointmentsEntry.TABLE_NAME + "." + DBContract.AppointmentsEntry.COLUMN_CLOSED,
             DBContract.AppointmentTypesEntry.TABLE_NAME + "." + DBContract.AppointmentTypesEntry.COLUMN_ICON
     };
+
+    private static final String ORDER_BY =
+            DBContract.PropositionsEntry.TABLE_NAME + "." +
+                    DBContract.PropositionsEntry.COLUMN_TIMESTAMP + " DESC";
+
     public static final int CURSOR_ID_COL = 0;
     public static final int CURSOR_NAME_COL = 1;
     public static final int CURSOR_TIMESTAMP_COL = 2;
@@ -59,6 +65,9 @@ public class AppointmentListFragment extends Fragment implements LoaderManager.L
     private String mAppointmentsState = null;
 
     private View mView = null;
+
+    private Handler mHandler;
+    private Runnable mUpdateTime;
 
     /**
      * Mandatory empty constructor for the fragment manager to newInstance the
@@ -79,7 +88,6 @@ public class AppointmentListFragment extends Fragment implements LoaderManager.L
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mAdapter = new AppointmentListRecyclerViewAdapter(getActivity(), this);
         Bundle args = getArguments();
         if (args != null) {
             mAppointmentsState = args.getString(ARG_APPOINTMENTS_STATE);
@@ -100,8 +108,34 @@ public class AppointmentListFragment extends Fragment implements LoaderManager.L
                 getContext().getString(R.string.text_nothing_to_show_yet,
                         getContext().getString(R.string.text_appointments)));
         recyclerView.setEmptyView(emptyView);
+        mAdapter = new AppointmentListRecyclerViewAdapter(getActivity(), this);
         recyclerView.setAdapter(mAdapter);
         return mView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mHandler == null) {
+            mHandler = new Handler();
+        }
+        mUpdateTime = new Runnable() {
+            @Override
+            public void run() {
+                // To cause it to update the times
+                mAdapter.notifyItemRangeChanged(0, mAdapter.getItemCount());
+                mHandler.postDelayed(this, 30000); // Half-minute precision
+            }
+        };
+        mHandler.postDelayed(mUpdateTime, 30000);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mHandler != null) {
+            mHandler.removeCallbacks(mUpdateTime);
+        }
     }
 
     @Override
@@ -134,7 +168,7 @@ public class AppointmentListFragment extends Fragment implements LoaderManager.L
                     default:
                         throw new IllegalArgumentException(mAppointmentsState + " is not a valid appointment state");
                 }
-                return new CursorLoader(getActivity(), uri, APPOINTMENTS_PROPOSITIONS_PROJECTION, null, null, null);
+                return new CursorLoader(getActivity(), uri, APPOINTMENTS_PROPOSITIONS_PROJECTION, null, null, ORDER_BY);
             default:
                 throw new IllegalArgumentException("Unknown loader id '" + id + "'");
         }

@@ -128,4 +128,6 @@
     <string name="message_accept_suggestion">Do you want to set the appointment time to \'%1$s\'?</string>
     <string name="title_change_time">Change time</string>
     <string name="change_proposal">Change date and time</string>
+    <string name="tomorrow">tomorrow</string>
+    <string name="yesterday">yesterday</string>
 </resources>

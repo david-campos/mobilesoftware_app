@@ -140,7 +140,7 @@ public class AppointmentListRecyclerViewAdapter extends CursorRecyclerViewAdapte
         int iconId = cursor.getInt(AppointmentListFragment.CURSOR_TYPE_ICON_COL);
         String uri = mContext.getString(R.string.api_types_format, mApiUri, iconId);
         Picasso pic = Picasso.with(mContext);
-        pic.setIndicatorsEnabled(true);
+//        pic.setIndicatorsEnabled(true);
         pic.load(uri)
                 .placeholder(R.drawable.unknown_type)
                 .resize(fIconSidePx, fIconSidePx)

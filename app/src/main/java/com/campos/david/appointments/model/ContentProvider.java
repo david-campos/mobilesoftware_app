@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDoneException;
 import android.database.sqlite.SQLiteStatement;
 import android.net.Uri;
+import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -478,6 +479,8 @@ public class ContentProvider extends android.content.ContentProvider {
         db.beginTransaction();
         SQLiteStatement checkInvitation = null;
         SQLiteStatement checkProposition = null;
+        SQLiteStatement checkTypeOrReason = null;
+        String typeOrReasonNameCol = null;
         if (tableAndUri[0].equals(InvitationsEntry.TABLE_NAME)) {
             String query = "SELECT " + InvitationsEntry._ID +
                     " FROM " + tableAndUri[0] +
@@ -494,6 +497,15 @@ public class ContentProvider extends android.content.ContentProvider {
                     PropositionsEntry.COLUMN_APPOINTMENT + "=?" +
                     " LIMIT 1";
             checkProposition = db.compileStatement(query);
+        } else if (tableAndUri[0].equals(AppointmentTypesEntry.TABLE_NAME) ||
+                tableAndUri[0].equals(ReasonsEntry.TABLE_NAME)) {
+            typeOrReasonNameCol = tableAndUri[0].equals(AppointmentTypesEntry.TABLE_NAME) ?
+                    AppointmentTypesEntry.COLUMN_NAME : ReasonsEntry.COLUMN_NAME;
+            String query = "SELECT " + BaseColumns._ID +
+                    " FROM " + tableAndUri[0] +
+                    " WHERE " + typeOrReasonNameCol + "=?" +
+                    " LIMIT 1";
+            checkTypeOrReason = db.compileStatement(query);
         }
         try {
             for (ContentValues cv : values) {
@@ -550,6 +562,23 @@ public class ContentProvider extends android.content.ContentProvider {
                     }
                 }
 
+                if (checkTypeOrReason != null) {
+                    long id;
+                    checkTypeOrReason.clearBindings();
+                    checkTypeOrReason.bindString(1, cv.getAsString(typeOrReasonNameCol));
+                    try {
+                        id = checkTypeOrReason.simpleQueryForLong();
+                    } catch (SQLiteDoneException e) {
+                        id = -1;
+                    }
+
+                    if (id != -1) {
+                        db.updateWithOnConflict(tableAndUri[0], cv,
+                                BaseColumns._ID + "=?", new String[]{Long.toString(id)}, SQLiteDatabase.CONFLICT_IGNORE);
+                        continue;
+                    }
+                }
+
                 long newID = db.insertWithOnConflict(tableAndUri[0], null, cv, SQLiteDatabase.CONFLICT_REPLACE);
                 if (newID <= 0) {
                     throw new SQLException("Failed to insert row into " + uri);
@@ -558,6 +587,13 @@ public class ContentProvider extends android.content.ContentProvider {
             if (checkInvitation != null) {
                 checkInvitation.close();
             }
+            if (checkProposition != null) {
+                checkProposition.close();
+            }
+            if (checkTypeOrReason != null) {
+                checkTypeOrReason.close();
+            }
+
             db.setTransactionSuccessful();
             Context ctx = getContext();
             if (ctx != null) {

@@ -41,6 +41,7 @@ public class UpdateUsersService extends IntentService {
 
     public static void usersUpdate(Context ctx, boolean includeFromDatabase) {
         ArrayList<String> phones = new ArrayList<>();
+        UserManager userManager = new UserManager(ctx);
         Cursor c = ctx.getContentResolver().query(
                 ContactsContract.Data.CONTENT_URI,
                 new String[]{ContactsContract.Data.DATA1},
@@ -64,14 +65,14 @@ public class UpdateUsersService extends IntentService {
                         phone = localPrefix + phone;
                     }
                 }
-                if (!phones.contains(phone)) {
+                if (!phones.contains(phone) && !userManager.isMe(phone)) {
                     phones.add(phone);
                 }
             }
             c.close();
         }
 
-        // Add the saved users
+        // Add the already saved users (for updating purposes)
         if (includeFromDatabase) {
             Cursor cursor = ctx.getContentResolver().query(
                     DBContract.UsersEntry.CONTENT_URI,
@@ -80,7 +81,7 @@ public class UpdateUsersService extends IntentService {
             if (cursor != null) {
                 while (cursor.moveToNext()) {
                     String phone = cursor.getString(0);
-                    if (!phones.contains(phone)) {
+                    if (!phones.contains(phone) && !userManager.isMe(phone)) {
                         phones.add(phone);
                     }
                 }
@@ -99,7 +100,7 @@ public class UpdateUsersService extends IntentService {
 
             ContentValues[] users = (new ApiConnector(ctx)).filterUsers(phones);
             if (users != null) {
-                (new UserManager(ctx)).insertUsers(users);
+                userManager.insertUsers(users);
                 // Last update time
                 ctx.getSharedPreferences(ctx.getString(R.string.session_file_key), Context.MODE_PRIVATE)
                         .edit()

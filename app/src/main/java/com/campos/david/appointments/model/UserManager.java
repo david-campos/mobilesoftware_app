@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.campos.david.appointments.R;
@@ -55,6 +56,10 @@ public class UserManager {
                     DBContract.UsersEntry.COLUMN_BLOCKED + "=?", new String[]{"1"});
             insertUsers(cvs);
         }
+    }
+
+    public boolean isMe(@NonNull String phoneNumber) {
+        return phoneNumber.equals(mSessionPreferences.getString(mContext.getString(R.string.session_phone_key), null));
     }
 
     public boolean isMe(int userId) {

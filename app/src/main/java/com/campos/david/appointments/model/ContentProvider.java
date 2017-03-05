@@ -427,6 +427,7 @@ public class ContentProvider extends android.content.ContentProvider {
             case PROPOSITIONS:
             case PROPOSITIONS_FOR_APPOINTMENT:
                 list.add(PropositionsEntry.CONTENT_URI);
+                list.add(AppointmentsEntry.CONTENT_URI);
                 break;
             case REASONS:
                 list.add(ReasonsEntry.CONTENT_URI);

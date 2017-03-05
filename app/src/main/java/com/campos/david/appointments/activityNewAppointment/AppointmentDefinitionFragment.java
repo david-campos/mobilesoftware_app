@@ -95,7 +95,7 @@ public class AppointmentDefinitionFragment extends Fragment
     private Button mTimestampButton;
     private MapView mPlaceMapView;
     private Button mPlaceButton;
-    private TextView mPlaceTextView;
+    private EditText mPlaceEditText;
 
     private SimpleCursorAdapter mAdapterTypes;
     private GoogleApiClient mGoogleApiClient;
@@ -112,13 +112,13 @@ public class AppointmentDefinitionFragment extends Fragment
         View mainView = inflater.inflate(R.layout.fragment_appointment_definition, container, false);
         saveViews(mainView);
 
-        mTextViewsColor = mPlaceTextView.getCurrentTextColor();
+        mTextViewsColor = mPlaceEditText.getCurrentTextColor();
 
         updateTimestampText();
         mPlaceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPlaceTextView.setTextColor(mTextViewsColor);
+                mPlaceEditText.setTextColor(mTextViewsColor);
                 if (mGoogleApiClient != null && mGoogleApiClient.isConnected())
                     displayPlacePicker();
                 else
@@ -275,7 +275,7 @@ public class AppointmentDefinitionFragment extends Fragment
         mTypeSpinner = (Spinner) view.findViewById(R.id.sp_type_of_appointments);
         mPlaceMapView = (MapView) view.findViewById(R.id.mv_locationMap);
         mTimestampTextView = (TextView) view.findViewById(R.id.tv_selected_timestamp);
-        mPlaceTextView = (TextView) view.findViewById(R.id.tv_place_name);
+        mPlaceEditText = (EditText) view.findViewById(R.id.et_place_name);
         mPlaceButton = (Button) view.findViewById(R.id.btn_change_place);
     }
 
@@ -340,7 +340,8 @@ public class AppointmentDefinitionFragment extends Fragment
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PLACE_PICKER_REQUEST && resultCode == Activity.RESULT_OK) {
             mPlace = PlacePicker.getPlace(getActivity(), data);
-            mPlaceTextView.setText(mPlace.getName().toString());
+            mPlaceEditText.setText(mPlace.getName().toString());
+            mPlaceEditText.setEnabled(true);
             updateMapToLocation();
         }
     }
@@ -439,7 +440,7 @@ public class AppointmentDefinitionFragment extends Fragment
         boolean failed = false;
         // Check that everything is set, if something is not indicate it
         if (mPlace == null) {
-            mPlaceTextView.setTextColor(getResources().getColor(R.color.colorBlock));
+            mPlaceEditText.setTextColor(getResources().getColor(R.color.colorBlock));
             failed = true;
         }
 
@@ -471,7 +472,7 @@ public class AppointmentDefinitionFragment extends Fragment
         }
 
         Bundle result = new Bundle();
-        result.putString(CreateAppointmentService.ExtrasKeys.PLACE, mPlace.getName().toString());
+        result.putString(CreateAppointmentService.ExtrasKeys.PLACE, mPlaceEditText.getText().toString());
         result.putDouble(CreateAppointmentService.ExtrasKeys.LAT, mPlace.getLatLng().latitude);
         result.putDouble(CreateAppointmentService.ExtrasKeys.LON, mPlace.getLatLng().longitude);
         // mTimestampValue should be UTC

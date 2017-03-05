@@ -102,11 +102,13 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <TextView
+        <EditText
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:id="@+id/tv_place_name"
+            android:id="@+id/et_place_name"
+            android:inputType="text"
+            android:enabled="false"
             android:text="@string/text_not_selected" />
 
         <Button

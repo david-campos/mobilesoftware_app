@@ -424,6 +424,7 @@ public class ContentProvider extends android.content.ContentProvider {
             case USERS_ITEM:
                 list.add(UsersEntry.CONTENT_URI);
                 break;
+            case PROPOSITIONS:
             case PROPOSITIONS_FOR_APPOINTMENT:
                 list.add(PropositionsEntry.CONTENT_URI);
                 break;
@@ -660,6 +661,9 @@ public class ContentProvider extends android.content.ContentProvider {
                 table = UsersEntry.TABLE_NAME;
                 selection = UsersEntry._ID + "=?";
                 selectionArgs = new String[]{uri.getLastPathSegment()};
+                break;
+            case PROPOSITIONS:
+                table = PropositionsEntry.TABLE_NAME;
                 break;
             case PROPOSITIONS_FOR_APPOINTMENT:
                 table = PropositionsEntry.TABLE_NAME;

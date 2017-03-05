@@ -148,6 +148,8 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Loader
             mSuggestChange = (Button) mMainView.findViewById(R.id.btn_suggestChange);
             mCloseDiscussion = (Button) mMainView.findViewById(R.id.btn_closeDiscussion);
 
+            mSuggestChange.setText(mIsMyAppointment ? getString(R.string.change_proposal) : getString(R.string.suggest_change));
+
             mAcceptInvitation.setEnabled(false);
             mSuggestChange.setEnabled(false);
             mRefuseInvitation.setEnabled(false);
@@ -254,6 +256,9 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Loader
     private void showDatePickerDialog() {
         // Get Current Date
         Calendar c = Calendar.getInstance();
+        if (mCurrentCursor != null && mCurrentCursor.moveToFirst() && !mCurrentCursor.isNull(COL_TIMESTAMP)) {
+            c.setTimeInMillis(mCurrentCursor.getLong(COL_TIMESTAMP) * 1000);
+        }
         int year = c.get(Calendar.YEAR);
         int month = c.get(Calendar.MONTH);
         int day = c.get(Calendar.DAY_OF_MONTH);
@@ -276,6 +281,9 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Loader
     private void showTimePickerDialog(final Calendar calendar) {
         // Get Current Time
         Calendar c = Calendar.getInstance();
+        if (mCurrentCursor != null && mCurrentCursor.moveToFirst() && !mCurrentCursor.isNull(COL_TIMESTAMP)) {
+            c.setTimeInMillis(mCurrentCursor.getLong(COL_TIMESTAMP) * 1000);
+        }
         int hour = c.get(Calendar.HOUR_OF_DAY);
         int minute = c.get(Calendar.MINUTE);
 

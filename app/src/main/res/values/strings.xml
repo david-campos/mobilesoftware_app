@@ -130,4 +130,6 @@
     <string name="change_proposal">Change date and time</string>
     <string name="tomorrow">tomorrow</string>
     <string name="yesterday">yesterday</string>
+    <string name="unable_connect_google">Unable to connect to Google Services</string>
+    <string name="retry">Retry</string>
 </resources>
